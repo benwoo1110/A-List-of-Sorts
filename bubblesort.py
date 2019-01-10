@@ -5,19 +5,19 @@ from random import randint
 pygame.init()
 size = (500,500)
 window = pygame.display.set_mode((size))
-pygame.display.set_caption("Pygame Bubble-Sort Visualization")
+pygame.display.set_caption("Bubble-Sort Visualization")
 black = pygame.Color(0,0,0)
 white = pygame.Color(255,255,255)
  
 #Declaring Variables
 heightList = []
-listLength = 500
+listLength = 20
 isSorted = False
 sortedCount = 0
 trackInt = 0
 
 #coordinate for drawing
-xList,y,w = [],0,1
+xList,y,w = [],0,500/listLength
 tmpX = 0
 
 #Creating all the random numbers
@@ -30,7 +30,7 @@ for i in range(listLength):
 def draw():
     global xList,y,heightList
     for i in range(listLength):
-        pygame.draw.rect(window,white,(xList[i],max(heightList) - heightList[i],w,heightList[i]),0)
+        pygame.draw.rect(window, white, (xList[i],500-heightList[i],w,heightList[i]), 0)
  
 #Algorithm
 while True:
