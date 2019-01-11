@@ -2,3 +2,10 @@ verbose - Object: Activating qiskit-vscode extension...
 verbose - Object: ✨ Activating qiskit-vscode extension... ✨
 error - Object: Seems like there was a problem: Version >= 3.5 of package python is required
 error - Object: Dependencies error: Version >= 3.5 of package python is required
+error - Object: /Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/mehtaaakashsanjay/Desktop/A': [Errno 2] No such file or directory
+
+error - Object: /Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/mehtaaakashsanjay/Desktop/A': [Errno 2] No such file or directory
+
+error - Object: /Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/mehtaaakashsanjay/Desktop/A': [Errno 2] No such file or directory
+
+verbose - Object: Deactivating Qiskit extension ...
