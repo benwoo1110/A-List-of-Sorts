@@ -29,11 +29,11 @@ def partition(Arr,first,last):
 
    while not isCompleted:
 
-       #Basically this is once everythin is sorted and it begins to move forward to sort everything else
+       #Basically this is once everythin is sorted and checks if its more
        while border <= end and Arr[border] <= pivotvalue:
            border = border + 1
 
-       #Same thing as above but documentation
+       #Same thing as above but opposite and in this cfase its less
        while Arr[end] >= pivotvalue and end >= border:
            end = end -1
 
