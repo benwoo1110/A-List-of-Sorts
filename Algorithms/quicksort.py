@@ -3,63 +3,47 @@ from random import randint
 
 #Initializing the window
 pygame.init()
-size = (500,500)
+size = (1500,500)
 window = pygame.display.set_mode((size))
-pygame.display.set_caption("Pygame Quick-Sort Visualization")
+pygame.display.set_caption("Quick-Sort Visualization")
 black = pygame.Color(0,0,0)
 white = pygame.Color(255,255,255)
+red = pygame.Color(255,0,0)
+green = pygame.Color(0,255,0)
  
 #Declaring Variables
 heightList = []
-listLength = 100
-isSorted = False
-sortedCount = 0
-trackInt = 0
+listLength = 10
+swap = False
 
 #coordinate for drawing
-xList,y,w = [],0,5
-tmpX = 0
+xList,y,w = [],0,size[0]/listLength
 
 #Creating all the random numbers
 for i in range(listLength):
     heightList.append(randint(0,500))
-    xList.append(tmpX)
-    tmpX += w
+    xList.append(w*i)
 
-#Actually Displaying the window
-def draw(color):
+#Displaying bars on the window
+def draw():
     global xList,y,heightList
+    window.fill(black)
     for i in range(listLength):
-        pygame.draw.rect(window,color,(xList[i],max(heightList) - heightList[i],w,heightList[i]),0)
- 
+        pygame.draw.rect(window, white, (xList[i],500-heightList[i],w,heightList[i]), 0)
+    
+def buffer():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
 
+def update_draw(): 
+    pygame.display.update()
+    pygame.time.Clock().tick(10)
+ 
+#Algorithm
 # Algorithm
 # While true is needed for the screen to stay there
 while True:
-    window.fill(black)
-
-    #the point needs to reset, hence:
-    if trackInt == listLength-1:
-        trackInt = 0
-
-    # #Condition once everything is done
-    # if sortedCount > listLength and isSorted == False:
-    #     #sorted count will go to or listlength 
-    #     print("Sorted!")
-    #     print(heightList)
-    #     isSorted = True
-    
-    # if heightList[trackInt] > heightList[trackInt+1] and isSorted == False:
-    #     tmp = heightList[trackInt+1]
-    #     heightList[trackInt+1],heightList[trackInt] = heightList[trackInt],tmp
-    #     sortedCount = 0
-    #     trackInt += 1
-
-    # else:
-    #     sortedCount += 1
-    #     trackInt += 1
-
-
 	# choose pivot_
 	# 2-way partition_
 	
