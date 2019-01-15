@@ -49,6 +49,7 @@ def partition(Arr,first,last):
 
 
    #it swaps again
+   temp = Arr[first]
    Arr[first] = Arr[end]
    Arr[end] = temp
 
