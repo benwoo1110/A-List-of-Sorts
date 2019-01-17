@@ -10,10 +10,11 @@ black = pygame.Color(0,0,0)
 white = pygame.Color(255,255,255)
 red = pygame.Color(255,0,0)
 green = pygame.Color(0,255,0)
+blue = pygame.Color(0, 0, 255)
  
 #Declaring Variables
 heightList = []
-listLength = 20
+listLength = 300
 
 #coordinate for drawing
 xList,y,w = [],0,size[0]/listLength
@@ -37,7 +38,7 @@ def buffer():
 
 def update_draw(): 
     pygame.display.update()
-    pygame.time.Clock().tick(10)
+    pygame.time.Clock().tick(1000000000)
  
 #Algorithm
 def quickSort(heightList):
@@ -57,6 +58,7 @@ def quickSortHelper(heightList,first,last):
 def partition(heightList,first,last):
    #set a pivot value, in our case at the start
    pivotvalue = heightList[first]
+   pivotindex = first
 
    #ensure that the border when swapping heightListound stuff, is right of the 
    border = first+1
@@ -67,6 +69,7 @@ def partition(heightList,first,last):
    while not isCompleted:
 
        draw()
+       pygame.draw.rect(window, blue, (xList[pivotindex],500-heightList[pivotindex],w,heightList[pivotindex]), 0)
        if swap:
            pygame.draw.rect(window, green, (xList[border],500-heightList[border],w,heightList[border]), 0)
            pygame.draw.rect(window, green, (xList[end],500-heightList[end],w,heightList[end]), 0)
@@ -98,6 +101,7 @@ def partition(heightList,first,last):
            
            #After swaps
            draw()
+           pygame.draw.rect(window, blue, (xList[pivotindex],500-heightList[pivotindex],w,heightList[pivotindex]), 0)
            pygame.draw.rect(window, green, (xList[border],500-heightList[border],w,heightList[border]), 0)
            pygame.draw.rect(window, green, (xList[end],500-heightList[end],w,heightList[end]), 0)
            update_draw()
@@ -113,6 +117,7 @@ def partition(heightList,first,last):
    heightList[first], heightList[end] = heightList[end], heightList[first]
 
    draw()
+   pygame.draw.rect(window, blue, (xList[pivotindex],500-heightList[pivotindex],w,heightList[pivotindex]), 0)
    pygame.draw.rect(window, green, (xList[first],500-heightList[first],w,heightList[first]), 0)
    pygame.draw.rect(window, green, (xList[end],500-heightList[end],w,heightList[end]), 0)
    update_draw()
