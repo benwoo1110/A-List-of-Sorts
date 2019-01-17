@@ -1,5 +1,5 @@
 from random import random, sample
-third = []
+
 def mergesort(Arr): 
     n = len(Arr)
     n = int(n)
@@ -8,29 +8,33 @@ def mergesort(Arr):
     m = int(n//2)
     first = Arr[:m]
     second = Arr[m:]
-
+    # print('---------')
+    # print(first, second)
     mergesort(first)
     mergesort(second)
 
-    # print(first, second)
-    merge(first, second)
+    i, j, k = 0, 0, 0
 
-
-def merge(first, second):
-    
-    while len(first) and len(second):
-        if first[0] > second[0]:
-            third.append(second.pop(0))
+    while i< len(first) and j < len(second):
+        if first[i] < second[j]:
+            Arr[k] = first[i]
+            i+=1
         else:
-            third.append(first.pop(0))
+            Arr[k] = second[j]
+            j+=1
 
-    while (len(first)):
-        third.append(first.pop(0))
+        k+=1
+    while i < len(first):
+        Arr[k] = first[i]
+        i+=1
+        k+=1
 
-    while (len(second)):
-        third.append(second.pop(0))
+    while j < len(second):
+        Arr[k] = second[j]
+        j+=1
+        k+=1
 
-    return third
-Arr = sample(range(100), 16)
+
+Arr = [54,26,93,17,77,31,44,55,20]
+mergesort(Arr)
 print(Arr)
-print(mergesort(Arr))
