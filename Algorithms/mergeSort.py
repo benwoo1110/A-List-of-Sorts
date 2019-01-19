@@ -13,7 +13,7 @@ green = pygame.Color(0, 255, 0)
 
 # Declaring Variables
 heightList = []
-listLength = 50
+listLength = 100
 swap = False
 
 # coordinate for drawing
@@ -27,10 +27,14 @@ for i in range(listLength):
 # Displaying bars on the window
 
 
-def draw():
+def draw(arrList, start, end):
     global xList, y, heightList
+    # Update heightList
+    for i in (start, end):
+        heightList[i] = arrList[i-start]
+        print(heightList)
     window.fill(black)
-    for i in range(listLength):
+    for i in range(len(heightList)):
         pygame.draw.rect(
             window, white, (xList[i], 500-heightList[i], w, heightList[i]), 0)
 
@@ -43,63 +47,60 @@ def buffer():
 
 def update_draw():
     pygame.display.update()
-    pygame.time.Clock().tick(100000)
+    pygame.time.Clock().tick(10)
 
 # Algorithm
 
 
-def mergesort(heightList):
-    n = len(heightList)
-    n = int(n)
+def mergesort(arrList, start, end):
+    n = int(len(arrList))
     if (n <= 1):
-        return heightList
+        return arrList
+
     m = int(n//2)
-    first = heightList[:m]
-    second = heightList[m:]
+    first = arrList[:m]
+    second = arrList[m:]
     # print('---------')
     # print(first, second)
-    mergesort(first)
-    mergesort(second)
+
+    mergesort(first, start, m+start-1)
+    mergesort(second, m+start, end)
 
     i, j, k = 0, 0, 0
 
     while i < len(first) and j < len(second):
         if first[i] < second[j]:
-            heightList[k] = first[i]
+            arrList[k] = first[i]
             i += 1
         else:
-            heightList[k] = second[j]
+            arrList[k] = second[j]
             j += 1
 
         k += 1
 
-        draw()
-        update_draw()
-        buffer()
-        # print('1')
+
 
     while i < len(first):
-        heightList[k] = first[i]
+        arrList[k] = first[i]
         i += 1
         k += 1
 
-        draw()
-        update_draw()
-        buffer()
-        # print('2')
+
 
     while j < len(second):
-        heightList[k] = second[j]
+        arrList[k] = second[j]
         j += 1
         k += 1
 
-        draw()
-        update_draw()
-        buffer()
-        # print('3')
+    draw(arrList, start, end)
+    update_draw()
+    buffer()
+
+    # print(arrList)
+    #print(start, end)
 
 
-mergesort(heightList)
+mergesort(heightList, 0, listLength-1)
 
 # Sort ended
 
