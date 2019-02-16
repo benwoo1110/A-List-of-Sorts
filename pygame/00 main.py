@@ -28,17 +28,19 @@ black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
 red = pygame.Color(255, 0, 0)
 green = pygame.Color(0, 255, 0)
-yellow_bg = pygame.Color(245, 138, 7)
+background_colour = pygame.Color(245, 138, 7)
+config_colour = pygame.Color(67, 67, 67)
 
 # Font set
 title_font = pygame.font.SysFont('Arial', 50)
+config_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
 
 # Top title bar
 title_height = 70
 spacing = 30
 
 def setTitle():
-    window.fill(yellow_bg)
+    window.fill(background_colour)
     title_text = title_font.render('Sorting', True, (0, 0, 0))
     window.blit(title_text,(spacing,5))
     pygame.draw.rect(window, black, (spacing, title_height, window_size[0]-(2*spacing), 1), 0)
@@ -69,17 +71,43 @@ setTitle()
 setBoxes()
 
 # Clicking action
-run_btn = pygame.image.load('run_btn.png').convert()
+# Config button
+bubblesortConfig_btn = pygame.image.load('bubblesortConfig_btn.png').convert()
+quicksortConfig_btn = pygame.image.load('quicksortConfig_btn.png').convert()
+mergesortConfig_btn = pygame.image.load('mergesortConfig_btn.png').convert()
+insertionsortConfig_btn = pygame.image.load('insertionsortConfig_btn.png').convert()
+
+# Run button
+bubblesortRun_btn = pygame.image.load('bubblesortRun_btn.png').convert()
+quicksortRun_btn = pygame.image.load('quicksortRun_btn.png').convert()
+mergesortRun_btn = pygame.image.load('mergesortRun_btn.png').convert()
+insertionsortRun_btn = pygame.image.load('insertionsortRun_btn.png').convert()
+
+# Sorting config
+runBtn_x, runBtn_y, runBtn_w, runBtn_h = 324, 200, 116, 56
+speedText_x, speedText_y, speedText_w, speedText_h = 216, 89, 45, 39 
+listlengthText_x, listlengthText_y, listlengthText_w, listlengthText_h = 216, 145, 37, 39 
+speed = 10
+listlength = 100
 
 # Check if cursor in box
-def cursor(frame, sort_image):
+def cursor(frame, sort_image, show_image, run_image):
     mouse_pos = pygame.mouse.get_pos()
     if frame[0]+sortingBoxes_size_w > mouse_pos[0] > frame[0] and frame[1]+sortingBoxes_size_h > mouse_pos[1] > frame[1]:
-        window.blit(run_btn, frame)
+        # Show image
+        window.blit(show_image, frame)
+        # Show config
+        speedConfig_text = config_font.render(str(speed) + ' x', True, config_colour)
+        listlengthConfig_text = config_font.render(str(listlength), True, config_colour)
+        window.blit(speedConfig_text,(frame[0]+speedText_x, frame[1]+speedText_y))
+        window.blit(listlengthConfig_text,(frame[0]+listlengthText_x, frame[1]+listlengthText_y))
+
         update_draw()
+
         # Mouse click in box
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            return True
+        if frame[0]+runBtn_x+runBtn_w > mouse_pos[0] > frame[0]+runBtn_x and frame[1]+runBtn_y+runBtn_h > mouse_pos[1] > frame[1]+runBtn_y:
+            window.blit(run_image, frame)
+            if event.type == pygame.MOUSEBUTTONDOWN: return True
     else:
         window.blit(sort_image, frame)
         update_draw()
@@ -90,19 +118,19 @@ while True:
             pygame.quit()
             quit()
 
-        if cursor(bubblesort_frame, bubblesort_btn):
+        if cursor(bubblesort_frame, bubblesort_btn, bubblesortConfig_btn, bubblesortRun_btn):
             bubblesort()
             setTitle() # Reset
             setBoxes()
-        elif cursor(quicksort_frame, quicksort_btn):
+        elif cursor(quicksort_frame, quicksort_btn, quicksortConfig_btn, quicksortRun_btn):
             quicksort()
             setTitle() # Reset
             setBoxes()
-        elif cursor(mergesort_frame, mergesort_btn):
+        elif cursor(mergesort_frame, mergesort_btn, mergesortConfig_btn, mergesortRun_btn):
             mergesort()
             setTitle() # Reset
             setBoxes()
-        elif cursor(insertionsort_frame, insertionsort_btn): # Algorithm not done
+        elif cursor(insertionsort_frame, insertionsort_btn, insertionsortConfig_btn, insertionsortRun_btn): # Algorithm not done
             # insertionsort()
             setTitle() # Reset
             setBoxes()
