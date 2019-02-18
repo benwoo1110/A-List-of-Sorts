@@ -9,17 +9,22 @@ size = (1000, 700)
 # coordinate for drawing
 xList, y, w = [], 0, size[0]/listLength
 
-def bubblesort():
+def bubblesort(speed, length):
     import pygame
     from random import randint
 
-    global heightList, listLength, numOfSelections, numOfSwaps, swap, size
+    global heightList, xList, w, listLength, numOfSelections, numOfSwaps, swap, size
 
     # Reset variables
     heightList = []
+    xList = []
     numOfSelections = 0
     numOfSwaps = 0
     swap = False
+
+    # Change accordance to length and speed input
+    listLength = length
+    w = size[0]/listLength
     
     # Initializing the window
     pygame.init()
@@ -52,16 +57,16 @@ def bubblesort():
                 pygame.quit()
 
 
-    def update_draw():
+    def update_draw(speed):
         pygame.display.update()
-        pygame.time.Clock().tick(5)
+        pygame.time.Clock().tick(int(5*speed))
 
 
     # Algorithm
     for i in range(listLength-1, 0, -1):
         for j in range(i):
             draw()
-            update_draw()
+            update_draw(speed)
 
             if swap:
                 pygame.draw.rect(
@@ -71,7 +76,7 @@ def bubblesort():
                 pygame.draw.rect(
                     window, red, (xList[j], 400-heightList[j], w, heightList[j]), 0)
 
-            update_draw()
+            update_draw(speed)
 
             if heightList[j] > heightList[j+1]:
                 heightList[j], heightList[j+1] = heightList[j+1], heightList[j]
@@ -95,13 +100,13 @@ def bubblesort():
     for i in range(listLength):
         pygame.draw.rect(
             window, green, (xList[i], 400-heightList[i], w, heightList[i]), 0)
-        update_draw()
+        update_draw(speed)
 
         buffer()
     # green going down
     for i in range(listLength-1, -1, -1):
         pygame.draw.rect(
             window, white, (xList[i], 400-heightList[i], w, heightList[i]), 0)
-        update_draw()
+        update_draw(speed)
 
         buffer()

@@ -30,9 +30,10 @@ red = pygame.Color(255, 0, 0)
 green = pygame.Color(0, 255, 0)
 background_colour = pygame.Color(245, 138, 7)
 config_colour = pygame.Color(67, 67, 67)
+title_colour = pygame.Color(40, 40, 40)
 
 # Font set
-title_font = pygame.font.SysFont('Arial', 50)
+title_font = pygame.font.SysFont('Helvetica Neue Bold', 85)
 config_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
 
 # Top title bar
@@ -41,9 +42,9 @@ spacing = 30
 
 def setTitle():
     window.fill(background_colour)
-    title_text = title_font.render('Sorting', True, (0, 0, 0))
+    title_text = title_font.render('Sorting', True, title_colour)
     window.blit(title_text,(spacing,5))
-    pygame.draw.rect(window, black, (spacing, title_height, window_size[0]-(2*spacing), 1), 0)
+    pygame.draw.rect(window, title_colour, (spacing, title_height, window_size[0]-(2*spacing), 2), 0)
     update_draw()
 
 # The 4 sorting boxes
@@ -86,32 +87,56 @@ run_btn = pygame.image.load('run_btn.png')
 runBtn_x, runBtn_y, runBtn_w, runBtn_h = 324, 200, 116, 56
 speedText_x, speedText_y, speedText_w, speedText_h = 216, 89, 45, 39 
 listlengthText_x, listlengthText_y, listlengthText_w, listlengthText_h = 216, 145, 37, 39 
-speed = 10
-listlength = 100
+speed = float(1.0)
+listlength = 10
+stepper_x = 90
+
+def showConfig(frame, show_image):
+    # Show image
+    window.blit(show_image, frame)
+    # Show config
+    speedConfig_text = config_font.render(str(round(speed,1)) + ' x', True, config_colour)
+    listlengthConfig_text = config_font.render(str(listlength), True, config_colour)
+    window.blit(speedConfig_text,(frame[0]+speedText_x, frame[1]+speedText_y))
+    window.blit(listlengthConfig_text,(frame[0]+listlengthText_x, frame[1]+listlengthText_y))
+
+    window.blit(stepper_btn,(frame[0]+speedText_x+stepper_x, frame[1]+speedText_y-3))
+    window.blit(stepper_btn,(frame[0]+listlengthText_x+stepper_x, frame[1]+listlengthText_y-3))
+    update_draw()
 
 # Check if cursor in box
 def cursor(frame, sort_image, show_image):
+    global speed, listlength
+
     mouse_pos = pygame.mouse.get_pos()
     if frame[0]+sortingBoxes_size_w > mouse_pos[0] > frame[0] and frame[1]+sortingBoxes_size_h > mouse_pos[1] > frame[1]:
-        # Show image
-        window.blit(show_image, frame)
-        # Show config
-        speedConfig_text = config_font.render(str(speed) + ' x', True, config_colour)
-        listlengthConfig_text = config_font.render(str(listlength), True, config_colour)
-        window.blit(speedConfig_text,(frame[0]+speedText_x, frame[1]+speedText_y))
-        window.blit(listlengthConfig_text,(frame[0]+listlengthText_x, frame[1]+listlengthText_y))
-
-        window.blit(stepper_btn,(frame[0]+speedText_x+80, frame[1]+speedText_y-3))
-        window.blit(stepper_btn,(frame[0]+listlengthText_x+80, frame[1]+listlengthText_y-3))
-        update_draw()
+        showConfig(frame, show_image)
 
         # Mouse click in stepper
-        # Stepper for speed
-        # -
-        # +
-        # Stepper for listlength
-        # -
-        # +
+        if event.type == pygame.MOUSEBUTTONDOWN: 
+            # Stepper for speed
+            # - 
+            if 0.2 < speed: 
+                if frame[0]+speedText_x+stepper_x+50 > mouse_pos[0] > frame[0]+speedText_x+stepper_x and frame[1]+speedText_y-3+39 > mouse_pos[1] > frame[1]+speedText_y-3:
+                    speed -= 0.1
+                    showConfig(frame, show_image)
+            # + 
+            if speed < 4.9:  
+                if frame[0]+speedText_x+stepper_x+100 > mouse_pos[0] > frame[0]+speedText_x+stepper_x+50 and frame[1]+speedText_y-3+39 > mouse_pos[1] > frame[1]+speedText_y-3:         
+                    speed += 0.1
+                    showConfig(frame, show_image)
+            
+            # Stepper for listlength
+            # -
+            if 1 < listlength:  
+                if frame[0]+listlengthText_x+stepper_x+50 > mouse_pos[0] > frame[0]+listlengthText_x+stepper_x and frame[1]+listlengthText_y-3+39 > mouse_pos[1] > frame[1]+listlengthText_y-3:
+                    listlength -= 1
+                    showConfig(frame, show_image)
+            # +
+            if listlength < 100: 
+                if frame[0]+listlengthText_x+stepper_x+100 > mouse_pos[0] > frame[0]+listlengthText_x+stepper_x+50 and frame[1]+listlengthText_y-3+39 > mouse_pos[1] > frame[1]+listlengthText_y-3:
+                    listlength += 1
+                    showConfig(frame, show_image)
 
         # Mouse click in box
         if frame[0]+runBtn_x+runBtn_w > mouse_pos[0] > frame[0]+runBtn_x and frame[1]+runBtn_y+runBtn_h > mouse_pos[1] > frame[1]+runBtn_y:
@@ -130,15 +155,15 @@ while True:
             quit()
 
         if cursor(bubblesort_frame, bubblesort_btn, bubblesortConfig_btn):
-            bubblesort()
+            bubblesort(speed, listlength)
             setTitle() # Reset
             setBoxes()
         elif cursor(quicksort_frame, quicksort_btn, quicksortConfig_btn):
-            quicksort()
+            quicksort(speed, listlength)
             setTitle() # Reset
             setBoxes()
         elif cursor(mergesort_frame, mergesort_btn, mergesortConfig_btn):
-            mergesort()
+            mergesort(speed, listlength)
             setTitle() # Reset
             setBoxes()
         elif cursor(insertionsort_frame, insertionsort_btn, insertionsortConfig_btn): # Algorithm not done

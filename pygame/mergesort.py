@@ -10,12 +10,17 @@ swap = False
 # coordinate for drawing
 xList, y, w = [], 0, size[0]/listLength
 
-def mergesort():
-    global heightList, listLength, size, swap
+def mergesort(speed, length):
+    global heightList, xList, w, listLength, size, swap
 
     # Reset values
     heightList = []
+    xList = []
     swap = False
+
+    # Change accordance to length and speed input
+    listLength = length
+    w = size[0]/listLength
 
     # Initializing the window
     pygame.init()
@@ -55,7 +60,7 @@ def mergesort():
                 else:
                     pygame.draw.rect(
                         window, white, (xList[j], 400-heightList[j], w, heightList[j]), 0)
-            update_draw()
+            update_draw(speed)
             buffer()
 
 
@@ -65,9 +70,9 @@ def mergesort():
                 pygame.quit()
 
 
-    def update_draw():
+    def update_draw(speed):
         pygame.display.update()
-        pygame.time.Clock().tick(100000)
+        pygame.time.Clock().tick(int(5*speed))
 
     # Algorithm
 
@@ -136,11 +141,11 @@ def mergesort():
     for i in range(listLength):
         pygame.draw.rect(
             window, green, (xList[i], 400-heightList[i], w, heightList[i]), 0)
-        update_draw()
+        update_draw(speed)
         buffer()
     # green going down
     for i in range(listLength-1, -1, -1):
         pygame.draw.rect(
             window, white, (xList[i], 400-heightList[i], w, heightList[i]), 0)
-        update_draw()
+        update_draw(speed)
         buffer()

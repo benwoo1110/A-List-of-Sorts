@@ -9,11 +9,16 @@ size = (1000,700)
 #coordinate for drawing
 xList,y,w = [],0,size[0]/listLength
 
-def quicksort():
-    global heightList, listLength, size
+def quicksort(speed, length):
+    global heightList, xList, w, listLength, size
 
     # Reset values
     heightList = []
+    xList = []
+
+    # Change accordance to length and speed input
+    listLength = length
+    w = size[0]/listLength
 
     #Initializing the window
     pygame.init()
@@ -42,9 +47,9 @@ def quicksort():
             if event.type == pygame.QUIT:
                 pygame.quit()
 
-    def update_draw(): 
+    def update_draw(speed): 
         pygame.display.update()
-        pygame.time.Clock().tick(5)
+        pygame.time.Clock().tick(int(5*speed))
     
     #Algorithm
     def quickSort(heightList):
@@ -80,7 +85,7 @@ def quicksort():
                 pygame.draw.rect(window, green, (xList[border],400-heightList[border],w,heightList[border]), 0)
                 pygame.draw.rect(window, green, (xList[end],400-heightList[end],w,heightList[end]), 0)
                 swap = False
-            update_draw()
+            update_draw(speed)
             buffer()
 
             #Basically this is once everythin is sorted and checks if its more
@@ -100,7 +105,7 @@ def quicksort():
                 #Before swaps
                 pygame.draw.rect(window, red, (xList[border],400-heightList[border],w,heightList[border]), 0)
                 pygame.draw.rect(window, red, (xList[end],400-heightList[end],w,heightList[end]), 0)
-                update_draw()
+                update_draw(speed)
                 buffer()
 
                 heightList[border], heightList[end] = heightList[end], heightList[border]
@@ -110,14 +115,14 @@ def quicksort():
                 pygame.draw.rect(window, blue, (xList[pivotindex],400-heightList[pivotindex],w,heightList[pivotindex]), 0)
                 pygame.draw.rect(window, green, (xList[border],400-heightList[border],w,heightList[border]), 0)
                 pygame.draw.rect(window, green, (xList[end],400-heightList[end],w,heightList[end]), 0)
-                update_draw()
+                update_draw(speed)
                 buffer()
 
 
         #it swaps again
         pygame.draw.rect(window, red, (xList[first],400-heightList[first],w,heightList[first]), 0)
         pygame.draw.rect(window, red, (xList[end],400-heightList[end],w,heightList[end]), 0)
-        update_draw()
+        update_draw(speed)
         buffer()
 
         heightList[first], heightList[end] = heightList[end], heightList[first]
@@ -126,7 +131,7 @@ def quicksort():
         pygame.draw.rect(window, blue, (xList[pivotindex],400-heightList[pivotindex],w,heightList[pivotindex]), 0)
         pygame.draw.rect(window, green, (xList[first],400-heightList[first],w,heightList[first]), 0)
         pygame.draw.rect(window, green, (xList[end],400-heightList[end],w,heightList[end]), 0)
-        update_draw()
+        update_draw(speed)
         buffer()
 
         return end
@@ -137,19 +142,19 @@ def quicksort():
 
     #End animation
     draw()
-    update_draw()
+    update_draw(speed)
     buffer()
     #green going up
     for i in range(0, listLength-1, 2):
         pygame.draw.rect(window, green, (xList[i],400-heightList[i],w,heightList[i]), 0)
         pygame.draw.rect(window, green, (xList[i+1],400-heightList[i+1],w,heightList[i+1]), 0)
-        update_draw()
+        update_draw(speed)
         buffer()
     #green going down
     for i in range(listLength-1, 0, -2):
         pygame.draw.rect(window, white, (xList[i],400-heightList[i],w,heightList[i]), 0)
         pygame.draw.rect(window, white, (xList[i-1],400-heightList[i-1],w,heightList[i-1]), 0)
-        update_draw()
+        update_draw(speed)
         buffer()
 
     #Show results
