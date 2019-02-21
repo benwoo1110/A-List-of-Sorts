@@ -33,18 +33,18 @@ config_colour = pygame.Color(67, 67, 67)
 title_colour = pygame.Color(40, 40, 40)
 
 # Font set
-title_font = pygame.font.SysFont('Helvetica Neue Bold', 85)
+# title_font = pygame.font.SysFont('Helvetica Neue Bold', 85)
 config_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
 
 # Top title bar
 title_height = 70
 spacing = 30
+mainscreen_image = pygame.image.load('mainscreen_image.png')
 
 def setTitle():
     window.fill(background_colour)
-    title_text = title_font.render('Sorting', True, title_colour)
-    window.blit(title_text,(spacing,5))
-    pygame.draw.rect(window, title_colour, (spacing, title_height, window_size[0]-(2*spacing), 2), 0)
+    
+    window.blit(mainscreen_image, (0, 0))
     update_draw()
 
 # The 4 sorting boxes

@@ -30,14 +30,14 @@ def bubblesort(speed, length):
     pygame.init()
     window = pygame.display.set_mode((size))
     pygame.display.set_caption("Bubble-Sort Visualization")
-    black = pygame.Color(0, 0, 0)
+    background_colour = pygame.Color(245, 138, 7)
     white = pygame.Color(255, 255, 255)
     red = pygame.Color(255, 0, 0)
     green = pygame.Color(0, 255, 0)
 
     # Creating all the random numbers
     for i in range(listLength):
-        heightList.append(randint(0, 400))
+        heightList.append(randint(10, 400))
         xList.append(w*i)
 
     # Displaying bars on the window
@@ -45,7 +45,7 @@ def bubblesort(speed, length):
 
     def draw():
         global xList, y, heightList
-        window.fill(black)
+        window.fill(background_colour)
         for i in range(listLength):
             pygame.draw.rect(
                 window, white, (xList[i], 400-heightList[i], w, heightList[i]), 0)
