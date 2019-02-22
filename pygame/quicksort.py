@@ -1,63 +1,131 @@
 import pygame
 from random import randint
+import time
 
-#Declaring Variables
+# Declaring Variables
+window_size = (1000, 700)
+
+listLength = 0
+titleHeight = 128
+maxHeight = 390
+spacing = 75
+runSpeed = 1.0
+
+numOfSwaps = 0
+runTime = 0
+backBtn_click = False
+swap = False
+
 heightList = []
-listLength = 20
-size = (1000,700)
-
-#coordinate for drawing
-xList,y,w = [],0,size[0]/listLength
+xList, y, w = [], 0, 0
 
 def quicksort(speed, length):
-    global heightList, xList, w, listLength, size
+    global heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, swap, backBtn_click, window_size, event
+    
+    # Initialization
+    pygame.init()
+    pygame.font.init()
+    window = pygame.display.set_mode((window_size))
 
-    # Reset values
+    # Reset variables
     heightList = []
     xList = []
+    numOfSelections = 0
+    numOfSwaps = 0
+    backBtn_click = False
+    swap = False
 
     # Change accordance to length and speed input
     listLength = length
-    w = size[0]/listLength
-
-    #Initializing the window
-    pygame.init()
-    window = pygame.display.set_mode((size))
-    pygame.display.set_caption("Quick-Sort Visualization")
-    black = pygame.Color(0,0,0)
+    runSpeed = speed
+    w = (window_size[0]-spacing*2)//listLength
+    spacing = (window_size[0]-w*listLength)//2
+    
+    # Colour
     white = pygame.Color(255,255,255)
     red = pygame.Color(255,0,0)
     green = pygame.Color(0,255,0)
     blue = pygame.Color(0, 0, 255)
+    stats_colour = pygame.Color(67, 67, 67)
+
+    # Font set
+    stats_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
     
     #Creating all the random numbers
     for i in range(listLength):
         heightList.append(randint(0,400))
-        xList.append(w*i)
+        xList.append(spacing + w*i)
+
+    def rect_draw(colour, x, y, w, h):
+        pygame.draw.rect(window, colour, (x, y, w, h), 0)
+
 
     #Displaying bars on the window
     def draw():
-        global xList,y,heightList
-        window.fill(black)
-        for i in range(listLength):
-            pygame.draw.rect(window, white, (xList[i],400-heightList[i],w,heightList[i]), 0)
+        global xList, y, heightList, listLength, numOfSwaps, backBtn_click
+        if backBtn_click: return True
         
-    def buffer():
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
+        # Top title bar
+        quicksortAlgo_image = pygame.image.load('quicksortAlgo_image.png')
+        window.blit(quicksortAlgo_image,(0, 0))
 
-    def update_draw(speed): 
+        # Update stats
+        timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
+        swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
+        speedStats_text = stats_font.render(str(round(speed, 1)) + " x", True, stats_colour)
+        listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
+        window.blit(timeStats_text,(321, 568))
+        window.blit(swapStats_text,(321, 616))
+        window.blit(speedStats_text,(729, 568))
+        window.blit(listlengthStats_text,(729, 616))
+         
+        # Update bars
+        for i in range(listLength):
+            rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
+
+    def buffer():
+        global runSpeed, backBtn_click, event
+        if backBtn_click: return True
+
+        backBtn_x, backBtn_y, backBtn_w, backBtn_h = 48, 28, 42, 42
+        mousePos = pygame.mouse.get_pos()
+        
+        for i in range(int(400/runSpeed)):
+            for event in pygame.event.get():
+                # if cusor click in back_btn
+                if event.type == pygame.MOUSEBUTTONDOWN: 
+                    if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
+                        backBtn_click = True
+                        return True
+                    if event.type == pygame.QUIT: pygame.quit()
+
+            time.sleep(0.001)
+
+    def update_draw(): 
+        global runSpeed, backBtn_click, event
+        if backBtn_click: return True
+
+        pygame.display.flip()
         pygame.display.update()
-        pygame.time.Clock().tick(int(5*speed))
+        pygame.time.Clock().tick(10000000000)
     
     #Algorithm
+    # Start sort
+    runTime = time.time()
+    # Load time cover 
+    timeCover_image = pygame.image.load('timeCover_image.png')
+
     def quickSort(heightList):
+        global backBtn_click
+        if backBtn_click: return True
+
         quickSortHelper(heightList,0,len(heightList)-1)
 
     def quickSortHelper(heightList,first,last):
-        if first<last:
+        global backBtn_click
+        if backBtn_click: return True
 
+        if first<last:
             #Its going to Partiition
             splitpoint = partition(heightList,first,last)
 
@@ -67,6 +135,9 @@ def quicksort(speed, length):
             quickSortHelper(heightList,splitpoint+1,last)
 
     def partition(heightList,first,last):
+        global backBtn_click, numOfSwaps, event
+        if backBtn_click: return True
+
         #set a pivot value, in our case at the start
         pivotvalue = heightList[first]
         pivotindex = first
@@ -80,13 +151,16 @@ def quicksort(speed, length):
         while not isCompleted:
 
             draw()
-            pygame.draw.rect(window, blue, (xList[pivotindex],400-heightList[pivotindex],w,heightList[pivotindex]), 0)
+            rect_draw(blue, xList[pivotindex], maxHeight+titleHeight-heightList[pivotindex], w, heightList[pivotindex])
             if swap:
-                pygame.draw.rect(window, green, (xList[border],400-heightList[border],w,heightList[border]), 0)
-                pygame.draw.rect(window, green, (xList[end],400-heightList[end],w,heightList[end]), 0)
+                rect_draw(green, xList[border], maxHeight+titleHeight-heightList[border], w, heightList[border])
+                rect_draw(green, xList[end], maxHeight+titleHeight-heightList[end], w, heightList[end])
                 swap = False
-            update_draw(speed)
+
+            update_draw()
             buffer()
+            if backBtn_click: return True
+    
 
             #Basically this is once everythin is sorted and checks if its more
             while border <= end and heightList[border] <= pivotvalue:
@@ -103,59 +177,78 @@ def quicksort(speed, length):
             #if not it swaps 
             else:
                 #Before swaps
-                pygame.draw.rect(window, red, (xList[border],400-heightList[border],w,heightList[border]), 0)
-                pygame.draw.rect(window, red, (xList[end],400-heightList[end],w,heightList[end]), 0)
-                update_draw(speed)
+                rect_draw(red, xList[border], maxHeight+titleHeight-heightList[border], w, heightList[border])
+                rect_draw(red, xList[end], maxHeight+titleHeight-heightList[end], w, heightList[end])
+                update_draw()
                 buffer()
+                if backBtn_click: return True
+    
 
                 heightList[border], heightList[end] = heightList[end], heightList[border]
                 
                 #After swaps
                 draw()
-                pygame.draw.rect(window, blue, (xList[pivotindex],400-heightList[pivotindex],w,heightList[pivotindex]), 0)
-                pygame.draw.rect(window, green, (xList[border],400-heightList[border],w,heightList[border]), 0)
-                pygame.draw.rect(window, green, (xList[end],400-heightList[end],w,heightList[end]), 0)
-                update_draw(speed)
+                rect_draw(blue, xList[pivotindex], maxHeight+titleHeight-heightList[pivotindex], w, heightList[pivotindex])
+                rect_draw(green, xList[border], maxHeight+titleHeight-heightList[border], w, heightList[border])
+                rect_draw(green, xList[end], maxHeight+titleHeight-heightList[end], w, heightList[end])
+                
+                numOfSwaps += 1
+                update_draw()
                 buffer()
+                if backBtn_click: return True
+    
 
 
         #it swaps again
-        pygame.draw.rect(window, red, (xList[first],400-heightList[first],w,heightList[first]), 0)
-        pygame.draw.rect(window, red, (xList[end],400-heightList[end],w,heightList[end]), 0)
-        update_draw(speed)
+        rect_draw(red, xList[first], maxHeight+titleHeight-heightList[first], w, heightList[first])
+        rect_draw(red, xList[end], maxHeight+titleHeight-heightList[end], w, heightList[end])
+        
+        update_draw() 
         buffer()
+        if backBtn_click: return True
+    
 
         heightList[first], heightList[end] = heightList[end], heightList[first]
 
         draw()
-        pygame.draw.rect(window, blue, (xList[pivotindex],400-heightList[pivotindex],w,heightList[pivotindex]), 0)
-        pygame.draw.rect(window, green, (xList[first],400-heightList[first],w,heightList[first]), 0)
-        pygame.draw.rect(window, green, (xList[end],400-heightList[end],w,heightList[end]), 0)
-        update_draw(speed)
+        rect_draw(blue, xList[pivotindex], maxHeight+titleHeight-heightList[pivotindex], w, heightList[pivotindex])
+        rect_draw(green, xList[first], maxHeight+titleHeight-heightList[first], w, heightList[first])
+        rect_draw(green, xList[end], maxHeight+titleHeight-heightList[end], w, heightList[end])
+        
+        numOfSwaps += 1
+        update_draw()
         buffer()
+        if backBtn_click: return True
 
         return end
 
     quickSort(heightList)
 
     #Sort Ended
+    #Show results
+    print(heightList)
 
     #End animation
     draw()
-    update_draw(speed)
+    update_draw()
     buffer()
+    if backBtn_click: return True
+    
     #green going up
-    for i in range(0, listLength-1, 2):
-        pygame.draw.rect(window, green, (xList[i],400-heightList[i],w,heightList[i]), 0)
-        pygame.draw.rect(window, green, (xList[i+1],400-heightList[i+1],w,heightList[i+1]), 0)
-        update_draw(speed)
+    for i in range(0, listLength-1):
+        rect_draw(green, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
+        update_draw()
         buffer()
+        if backBtn_click: return True
+    
     #green going down
-    for i in range(listLength-1, 0, -2):
-        pygame.draw.rect(window, white, (xList[i],400-heightList[i],w,heightList[i]), 0)
-        pygame.draw.rect(window, white, (xList[i-1],400-heightList[i-1],w,heightList[i-1]), 0)
-        update_draw(speed)
+    for i in range(listLength-1, -1, -1):
+        rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
+        update_draw()
         buffer()
+        if backBtn_click: return True
 
-    #Show results
-    print(heightList)
+
+    while True:
+       buffer()
+       if backBtn_click: return True

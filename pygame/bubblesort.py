@@ -18,7 +18,7 @@ heightList = []
 xList, y, w = [], 0, 0
 
 def bubblesort(speed, length):
-    global heightList, xList, w, listLength, titleHeight, numOfSwaps, runTime, swap, window_size
+    global heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, window_size
     
     # Initialization
     pygame.init()
@@ -34,7 +34,8 @@ def bubblesort(speed, length):
 
     # Change accordance to length and speed input
     listLength = length
-    w = (window_size[0]-spacing*2)/listLength
+    w = (window_size[0]-spacing*2)//listLength
+    spacing = (window_size[0]-w*listLength)//2
 
     # colours
     white = pygame.Color(255, 255, 255)
@@ -65,10 +66,10 @@ def bubblesort(speed, length):
         swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
         speedStats_text = stats_font.render(str(round(speed, 1)) + " x", True, stats_colour)
         listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
-        window.blit(timeStats_text,(321, 564))
-        window.blit(swapStats_text,(321, 612))
-        window.blit(speedStats_text,(739, 564))
-        window.blit(listlengthStats_text,(739, 612))
+        window.blit(timeStats_text,(321, 568))
+        window.blit(swapStats_text,(321, 616))
+        window.blit(speedStats_text,(729, 568))
+        window.blit(listlengthStats_text,(729, 616))
          
 
         for i in range(listLength):
@@ -94,7 +95,7 @@ def bubblesort(speed, length):
     timeCover_image = pygame.image.load('timeCover_image.png')
 
     # Algorithm
-    for i in range(listLength-1, 0, -1):
+    for i in range(listLength-1, -1, -1):
         for j in range(i):
             draw() # Draw fundamental bars first
 
