@@ -12,14 +12,13 @@ spacing = 75
 
 numOfSwaps = 0
 runTime = 0
-swap = False
 
 heightList_orginal = []
 heightList = []
 xList, y, w = [], 0, 0
 
-def bubblesort(speed, length, replay):
-    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, window_size, event
+def insertionsort(speed, length, replay):
+    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, window_size, event
     
     # Initialization
     pygame.init()
@@ -57,7 +56,6 @@ def bubblesort(speed, length, replay):
             xList.append(spacing + w*i)
         heightList_orginal = heightList.copy()
         print(heightList_orginal)
-    
 
     def rect_draw(colour, x, y, w, h):
         pygame.draw.rect(window, colour, (x, y, w, h), 0)
@@ -66,8 +64,8 @@ def bubblesort(speed, length, replay):
         global xList, y, heightList, listLength, numOfSwaps
         
         # Draw UI
-        bubblesortAlgo_image = pygame.image.load('bubblesortAlgo_image.png')
-        window.blit(bubblesortAlgo_image,(0, 0))
+        insertionsortAlgo_image = pygame.image.load('insertionsortAlgo_image.png')
+        window.blit(insertionsortAlgo_image,(0, 0))
         update_draw()
 
 
@@ -110,13 +108,13 @@ def bubblesort(speed, length, replay):
     # Fade in animation
     def animate_fadein():
         mainscreen_image = pygame.image.load('mainscreen_image.png').convert()
-        bubblesortAlgo_image = pygame.image.load('bubblesortAlgo_image.png').convert()
+        insertionsortAlgo_image = pygame.image.load('insertionsortAlgo_image.png').convert()
 
         window.blit(mainscreen_image,(0, 0))
 
         for i in range (160, 257, 32):
-            bubblesortAlgo_image.set_alpha(i)
-            window.blit(bubblesortAlgo_image,(0, 0))
+            insertionsortAlgo_image.set_alpha(i)
+            window.blit(insertionsortAlgo_image,(0, 0))
             update_draw()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: pygame.quit()
@@ -126,26 +124,25 @@ def bubblesort(speed, length, replay):
     # Load time cover 
     timeCover_image = pygame.image.load('timeCover_image.png')
 
+    draw()
+    update_draw()
+    if backBtn_click(): return True
+
     # Algorithm
-    for i in range(listLength-1, -1, -1):
-        for j in range(i):
-            draw() # Draw fundamental bars first
+    for c in range(1, listLength): #Green
+        for s in range(c, 0, -1):
+            if heightList[s] < heightList[s-1]:
+                draw()
+                rect_draw(red, xList[s], maxHeight+titleHeight-heightList[s], w, heightList[s])
+                rect_draw(red, xList[s-1], maxHeight+titleHeight-heightList[s-1], w, heightList[s-1])
+                rect_draw(green, xList[c], maxHeight+titleHeight-heightList[c], w, heightList[c])
+                update_draw()
+                heightList[s], heightList[s-1] = heightList[s-1], heightList[s]
+                numOfSwaps +=1
+                if backBtn_click(): return True
 
-            if swap:
-                rect_draw(green, xList[j], maxHeight+titleHeight-heightList[j], w, heightList[j])
-                swap = False
-            else: 
-                rect_draw(red, xList[j], maxHeight+titleHeight-heightList[j], w, heightList[j])
-            
-            update_draw()
-
-            if heightList[j] > heightList[j+1]:
-                heightList[j], heightList[j+1] = heightList[j+1], heightList[j]
-                swap = True
-
-                numOfSwaps += 1
-
-            if backBtn_click(): return True
+            else: break
+    draw()
     
     # Sort ended
     time_end = time.time()
@@ -185,6 +182,6 @@ def bubblesort(speed, length, replay):
                 if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
                     return True
                 if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y:
-                    bubblesort(speed, length, True)
+                    insertionsort(speed, length, True)
                     return True
             if event.type == pygame.QUIT: pygame.quit()

@@ -16,44 +16,52 @@ runTime = 0
 backBtn_click = False
 swap = False
 
+heightList_orginal = []
 heightList = []
 xList, y, w = [], 0, 0
 
-def mergesort(speed, length):
-    global heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, backBtn_click, swap, window_size, event
+def mergesort(speed, length, replay):
+    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, backBtn_click, swap, window_size, event
     
     # Initialization
     pygame.init()
     pygame.font.init()
     window = pygame.display.set_mode((window_size))
 
-    # Reset variables
-    heightList = []
-    xList = []
-    numOfSelections = 0
-    numOfSwaps = 0
-    backBtn_click = False
-    swap = False
-
     # Change accordance to length and speed input
     listLength = length
     runSpeed = speed
     w = (window_size[0]-spacing*2)//listLength
     spacing = (window_size[0]-w*listLength)//2
+    numOfSwaps = 0
+    backBtn_click = False
 
-    # colours
-    white = pygame.Color(255, 255, 255)
-    red = pygame.Color(255, 0, 0)
-    green = pygame.Color(0, 255, 0)
+    # Colour
+    white = pygame.Color(255,255,255)
+    red = pygame.Color(255,0,0)
+    green = pygame.Color(0,255,0)
+    blue = pygame.Color(0, 0, 255)
     stats_colour = pygame.Color(67, 67, 67)
+    background_colour = pygame.Color(245, 138, 7)
 
     # Font set
     stats_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
 
-    # Creating all the random numbers
-    for i in range(listLength):
-        heightList.append(randint(10, maxHeight))
-        xList.append(spacing + w*i)
+    if replay: 
+        # Get previous heightList
+        heightList = heightList_orginal.copy()
+        print(heightList_orginal)
+    else: 
+        # Reset variables
+        xList = []
+        heightList = []
+        
+        # Creating all the random numbers
+        for i in range(listLength):
+            heightList.append(randint(10, maxHeight))
+            xList.append(spacing + w*i)
+        heightList_orginal = heightList.copy()
+        print(heightList_orginal)
 
     def rect_draw(colour, x, y, w, h):
         pygame.draw.rect(window, colour, (x, y, w, h), 0)
@@ -94,9 +102,10 @@ def mergesort(speed, length):
         if backBtn_click: return True
 
         backBtn_x, backBtn_y, backBtn_w, backBtn_h = 48, 28, 42, 42
-        mousePos = pygame.mouse.get_pos()
         
         for i in range(int(400/runSpeed)):
+            mousePos = pygame.mouse.get_pos()
+
             for event in pygame.event.get():
                 # if cusor click in back_btn
                 if event.type == pygame.MOUSEBUTTONDOWN: 
@@ -106,19 +115,34 @@ def mergesort(speed, length):
                 if event.type == pygame.QUIT: pygame.quit()
                     
             time.sleep(0.001)
-        print(backBtn_click)
 
     def update_draw():
         pygame.display.update()
         pygame.time.Clock().tick(10000000000)
 
-    # Algorithm
+    
     # Start sort
+    # Fade in animation
+    def animate_fadein():
+        mainscreen_image = pygame.image.load('mainscreen_image.png').convert()
+        mergesortAlgo_image = pygame.image.load('mergesortAlgo_image.png').convert()
+
+        window.blit(mainscreen_image,(0, 0))
+
+        for i in range (160, 257, 32):
+            mergesortAlgo_image.set_alpha(i)
+            window.blit(mergesortAlgo_image,(0, 0))
+            update_draw()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: pygame.quit()
+
+    # Start timing
     runTime = time.time()
     # Load time cover 
     timeCover_image = pygame.image.load('timeCover_image.png')
 
-    def mergesort(arrList, start, end):
+    # Algorithm
+    def mergesort_algo(arrList, start, end):
         global backBtn_click
         if backBtn_click: return True
             
@@ -132,7 +156,8 @@ def mergesort(speed, length):
         # print('---------')
         # print(first, second)
 
-        mergesort(second, m+start, end)
+        mergesort_algo(first, start, m+start-1)
+        mergesort_algo(second, m+start, end)
 
         heightList_before = heightList.copy()
         # print(heightList_before)
@@ -166,7 +191,7 @@ def mergesort(speed, length):
         if backBtn_click: return True
 
     # Run sort
-    heightList_before = mergesort(heightList, 0, listLength-1)
+    heightList_before = mergesort_algo(heightList, 0, listLength-1)
 
     # Sort ended
     if backBtn_click: return True
@@ -192,7 +217,23 @@ def mergesort(speed, length):
         buffer()
         if backBtn_click: return True
 
+    # Coordinates of back && replay btn
+    backBtn_x, backBtn_y, backBtn_w, backBtn_h = 48, 28, 42, 42
+    replayBtn_x, replayBtn_y, replayBtn_w, replayBtn_h = 791, 454, 165, 54
+
+    # Drawn replay_btn
+    replay_btn = pygame.image.load('replay_btn.png')
+    window.blit(replay_btn,(791, 454))
+    update_draw()
 
     while True:
-       buffer()
-       if backBtn_click: return True
+        mousePos = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN: 
+                # if cusor click in back_btn
+                if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
+                    return True
+                if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y:
+                    mergesort(speed, length, True)
+                    return True
+            if event.type == pygame.QUIT: pygame.quit()

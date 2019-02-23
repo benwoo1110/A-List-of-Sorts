@@ -5,6 +5,7 @@ import time
 from bubblesort import *
 from quicksort import *
 from mergesort import *
+from insertionsort import *
 
 # Initialization
 pygame.init()
@@ -36,16 +37,10 @@ title_colour = pygame.Color(40, 40, 40)
 # title_font = pygame.font.SysFont('Helvetica Neue Bold', 85)
 config_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
 
-# Top title bar
+# Title bar
 title_height = 80
 spacing = 30
-mainscreen_image = pygame.image.load('mainscreen_image.png')
-
-def setTitle():
-    window.fill(background_colour)
-    
-    window.blit(mainscreen_image, (0, 0))
-    update_draw()
+mainscreen_image = pygame.image.load('mainscreen_image.png').convert()
 
 # The 4 sorting boxes
 sortingBoxes_size_w, sortingBoxes_size_h = (window_size[0]-(3*spacing))/2, (window_size[1]-title_height-(3*spacing))/2
@@ -60,16 +55,18 @@ quicksort_btn = pygame.image.load('quicksort_btn.png')
 mergesort_btn = pygame.image.load('mergesort_btn.png')
 insertionsort_btn = pygame.image.load('insertionsort_btn.png')
 
-def setBoxes():
+# Fade in animation
+def setup():
+    window.blit(mainscreen_image, (0, 0))
     window.blit(bubblesort_btn, bubblesort_frame)
     window.blit(quicksort_btn, quicksort_frame)
     window.blit(mergesort_btn, mergesort_frame)
     window.blit(insertionsort_btn, insertionsort_frame)
 
     update_draw()
+    buffer()
 
-setTitle()
-setBoxes()
+setup()
 
 # Clicking action
 # Config button
@@ -77,8 +74,6 @@ bubblesortConfig_btn = pygame.image.load('bubblesortConfig_btn.png')
 quicksortConfig_btn = pygame.image.load('quicksortConfig_btn.png')
 mergesortConfig_btn = pygame.image.load('mergesortConfig_btn.png')
 insertionsortConfig_btn = pygame.image.load('insertionsortConfig_btn.png')
-
-stepper_btn = pygame.image.load('stepper_btn.png')
 
 # Run button
 runUnselected_btn = pygame.image.load('runUnselected_btn.png')
@@ -100,9 +95,6 @@ def showConfig(frame, show_image):
     listlengthConfig_text = config_font.render(str(listlength), True, config_colour)
     window.blit(speedConfig_text,(frame[0]+speedText_x, frame[1]+speedText_y))
     window.blit(listlengthConfig_text,(frame[0]+listlengthText_x, frame[1]+listlengthText_y))
-
-    window.blit(stepper_btn,(frame[0]+speedText_x+stepper_x, frame[1]+speedText_y-3))
-    window.blit(stepper_btn,(frame[0]+listlengthText_x+stepper_x, frame[1]+listlengthText_y-3))
 
     update_draw()
 
@@ -178,21 +170,20 @@ def cursor(frame, sort_image, show_image):
 # Main loop
 while True:
     if cursor(bubblesort_frame, bubblesort_btn, bubblesortConfig_btn):
-        bubblesort(speed, listlength)
-        setTitle() # Reset
-        setBoxes()
+        bubblesort(speed, listlength, False)
+        setup()
+
     elif cursor(quicksort_frame, quicksort_btn, quicksortConfig_btn):
-        quicksort(speed, listlength)
-        setTitle() # Reset
-        setBoxes()
+        quicksort(speed, listlength, False)
+        setup()
+
     elif cursor(mergesort_frame, mergesort_btn, mergesortConfig_btn):
-        mergesort(speed, listlength)
-        setTitle() # Reset
-        setBoxes()
-    elif cursor(insertionsort_frame, insertionsort_btn, insertionsortConfig_btn): # Algorithm not done
-        # insertionsort()
-        setTitle() # Reset
-        setBoxes()
+        mergesort(speed, listlength, False)
+        setup()
+
+    elif cursor(insertionsort_frame, insertionsort_btn, insertionsortConfig_btn):
+        insertionsort(speed, listlength, False)
+        setup()
 
     buffer()
 
