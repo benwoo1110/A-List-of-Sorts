@@ -1,5 +1,5 @@
 import pygame
-from random import randint
+from random import shuffle
 import time
 
 # Declaring Variables
@@ -12,17 +12,18 @@ spacing = 75
 
 numOfSwaps = 0
 runTime = 0
-swap = False
-backSelected_drawn = False
 
 heightList_orginal = []
 heightList = []
 xList, y, w = [], 0, 0
 
-window = pygame.display.set_mode((window_size))
-
-def bubblesort(speed, length, replay):
-    global window, heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event
+def radixsort(speed, length, replay):
+    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, window_size, event
+    
+    # Initialization
+    pygame.init()
+    pygame.font.init()
+    window = pygame.display.set_mode((window_size))
 
     # Change accordance to length and speed input
     listLength = length
@@ -43,6 +44,7 @@ def bubblesort(speed, length, replay):
     if replay: 
         # Get previous heightList
         heightList = heightList_orginal.copy()
+        print(heightList_orginal)
     else: 
         # Reset variables
         xList = []
@@ -50,24 +52,21 @@ def bubblesort(speed, length, replay):
         
         # Creating all the random numbers
         for i in range(listLength):
-            heightList.append(randint(10, maxHeight))
+            heightList.append((i+1) * maxHeight // length)
             xList.append(spacing + w*i)
+        shuffle(heightList)
         heightList_orginal = heightList.copy()
+        print(heightList_orginal)
 
     def rect_draw(colour, x, y, w, h):
-        global window
         pygame.draw.rect(window, colour, (x, y, w, h), 0)
 
     def draw():
-        global window, xList, y, heightList, listLength, numOfSwaps, backSelected_drawn
+        global xList, y, heightList, listLength, numOfSwaps
         
         # Draw UI
-        bubblesortAlgo_image = pygame.image.load('bubblesortAlgo_image.png')
-        window.blit(bubblesortAlgo_image,(0, 0))
-        if backSelected_drawn: # Show BackSelected_btn
-            backSelected_btn = pygame.image.load('backSelected_btn.png')
-            window.blit(backSelected_btn,(0, 0))
-
+        radixsortAlgo_image = pygame.image.load('radixsortAlgo_image.png')
+        window.blit(radixsortAlgo_image,(0, 0))
         update_draw()
 
 
@@ -86,28 +85,17 @@ def bubblesort(speed, length, replay):
             rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
 
     def backBtn_click():
-        global window, backSelected_drawn, event
+        global event
         backBtn_x, backBtn_y, backBtn_w, backBtn_h = 48, 28, 42, 42
 
         for i in range(int(400/speed)):
             mousePos = pygame.mouse.get_pos()
-
+        
             for event in pygame.event.get():
-                # If cursor over back_btn
-                if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
-                    if not backSelected_drawn: 
-                        backSelected_btn = pygame.image.load('backSelected_btn.png')
-                        window.blit(backSelected_btn,(0, 0))
-                        update_draw()
-                        backSelected_drawn = True                    
-                    if event.type == pygame.MOUSEBUTTONDOWN: return True # check if back_btn clicked
-                else: 
-                    if backSelected_drawn: 
-                        backUnselected_btn = pygame.image.load('backUnselected_btn.png')
-                        window.blit(backUnselected_btn,(0, 0))
-                        update_draw()
-                        backSelected_drawn = False   
-                
+                # check if back btn clicked
+                if event.type == pygame.MOUSEBUTTONDOWN: 
+                    if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
+                        return True
                 if event.type == pygame.QUIT: pygame.quit()
 
             time.sleep(0.001)
@@ -120,51 +108,68 @@ def bubblesort(speed, length, replay):
     # Start sort
     # Fade in animation
     def animate_fadein():
-        global window
+        mainscreen_image = pygame.image.load('mainscreen_image.png').convert()
+        radixsortAlgo_image = pygame.image.load('radixsortAlgo_image.png').convert()
 
-        bubblesortAlgo_image = pygame.image.load('bubblesortAlgo_image.png').convert()
+        window.blit(mainscreen_image,(0, 0))
 
-        for i in range (160, 257, 32):
-            bubblesortAlgo_image.set_alpha(i)
-            window.blit(bubblesortAlgo_image,(0, 0))
+        for i in range (128, 257, 32):
+            radixsortAlgo_image.set_alpha(i)
+            window.blit(radixsortAlgo_image,(0, 0))
             update_draw()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: pygame.quit()
-
-    ## animate_fadein()
 
     # Start timing
     runTime = time.time()
     # Load time cover 
     timeCover_image = pygame.image.load('timeCover_image.png')
 
+    draw()
+    update_draw()
+    if backBtn_click(): return True
+
     # Algorithm
-    for i in range(listLength-1, -1, -1):
-        for j in range(i):
-            draw() # Draw fundamental bars first
-
-            if swap:
-                rect_draw(green, xList[j], maxHeight+titleHeight-heightList[j], w, heightList[j])
-                swap = False
-            else: 
-                rect_draw(red, xList[j], maxHeight+titleHeight-heightList[j], w, heightList[j])
-            
+    radixList = [[int(heightList[x]/100), int(heightList[x]%100/10), heightList[x]%10] for x in range(length)]
+    for m in range(-1, -4, -1):
+        hSort = [[] for x in range(10)]
+        rSort = [[] for x in range(10)]
+        for c in range(length):
+            draw()
+            rect_draw(green, xList[c], maxHeight+titleHeight-heightList[c], w, heightList[c])
             update_draw()
-
-            if heightList[j] > heightList[j+1]:
-                heightList[j], heightList[j+1] = heightList[j+1], heightList[j]
-                swap = True
-
-                numOfSwaps += 1
-
             if backBtn_click(): return True
+            for i in range(10):
+                if radixList[c][m] == i:
+                    hSort[i] += [heightList[c]]
+                    rSort[i] += [radixList[c]]
+        for i in range(9, -1, -1):
+            for j in range(len(hSort[i])):
+                if hSort[i] != []:
+                    numOfSwaps += 1
+                    draw()
+                    for y in [d for d,x in enumerate(heightList) if x == hSort[i][-1]]:
+                        rect_draw(red, xList[y], maxHeight+titleHeight-heightList[y], w, heightList[y])
+                    update_draw()
+                    if backBtn_click(): return True
+                    for t in range(int(400/speed)): time.sleep(0.0005)
+                    print(i)
+                    print(hSort)
+                    heightList.remove(hSort[i][-1])
+                    heightList =  [hSort[i][-1]] + heightList
+                    hSort[i].remove(hSort[i][-1])
+                    radixList.remove(rSort[i][-1])
+                    radixList =  [rSort[i][-1]] + radixList
+                    rSort[i].remove(rSort[i][-1])
+                    draw()
+                    rect_draw(red, xList[0], maxHeight+titleHeight-heightList[0], w, heightList[0])
+                    update_draw()
+                    if backBtn_click(): return True
+                    for t in range(int(400/speed)): time.sleep(0.0005)
+    draw()
     
     # Sort ended
     time_end = time.time()
-
-    draw() 
-    update_draw()
-    if backBtn_click(): return True
 
     # Print sorted list to console
     print(heightList)
@@ -196,24 +201,11 @@ def bubblesort(speed, length, replay):
     while True:
         mousePos = pygame.mouse.get_pos()
         for event in pygame.event.get():
-            # If cursor over back_btn
-            if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
-                if not backSelected_drawn: 
-                    backSelected_btn = pygame.image.load('backSelected_btn.png')
-                    window.blit(backSelected_btn,(0, 0))
-                    update_draw()
-                    backSelected_drawn = True                    
-                if event.type == pygame.MOUSEBUTTONDOWN: return True # check if back_btn clicked
-            else: 
-                if backSelected_drawn: 
-                    backUnselected_btn = pygame.image.load('backUnselected_btn.png')
-                    window.blit(backUnselected_btn,(0, 0))
-                    update_draw()
-                    backSelected_drawn = False   
-
-            if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    bubblesort(speed, length, True)
+            if event.type == pygame.MOUSEBUTTONDOWN: 
+                # if cusor click in back_btn
+                if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
                     return True
-
+                if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y:
+                    radixsort(speed, length, True)
+                    return True
             if event.type == pygame.QUIT: pygame.quit()

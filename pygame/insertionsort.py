@@ -35,6 +35,7 @@ def insertionsort(speed, length, replay):
     white = pygame.Color(255, 255, 255)
     red = pygame.Color(255, 0, 0)
     green = pygame.Color(0, 255, 0)
+    blue = pygame.Color(0, 0, 255)
     stats_colour = pygame.Color(67, 67, 67)
     background_colour = pygame.Color(245, 138, 7)
 
@@ -132,12 +133,21 @@ def insertionsort(speed, length, replay):
     for c in range(1, listLength): #Green
         for s in range(c, 0, -1):
             if heightList[s] < heightList[s-1]:
+                # Before Swap
                 draw()
-                rect_draw(red, xList[s], maxHeight+titleHeight-heightList[s], w, heightList[s])
+                rect_draw(blue, xList[c], maxHeight+titleHeight-heightList[c], w, heightList[c])
+                rect_draw(green, xList[s], maxHeight+titleHeight-heightList[s], w, heightList[s])
                 rect_draw(red, xList[s-1], maxHeight+titleHeight-heightList[s-1], w, heightList[s-1])
-                rect_draw(green, xList[c], maxHeight+titleHeight-heightList[c], w, heightList[c])
                 update_draw()
                 heightList[s], heightList[s-1] = heightList[s-1], heightList[s]
+                if backBtn_click(): return True
+                
+                # After swap
+                draw()
+                rect_draw(blue, xList[c], maxHeight+titleHeight-heightList[c], w, heightList[c])
+                rect_draw(red, xList[s], maxHeight+titleHeight-heightList[s], w, heightList[s])
+                rect_draw(green, xList[s-1], maxHeight+titleHeight-heightList[s-1], w, heightList[s-1])
+                update_draw()
                 numOfSwaps +=1
                 if backBtn_click(): return True
 
