@@ -2,6 +2,8 @@ import pygame
 from random import randint
 import time
 
+from history import *
+
 # Declaring Variables
 window_size = (1000, 700)
 
@@ -251,12 +253,18 @@ def quicksort(speed, length, replay):
     #Show results
     print(heightList)
 
-    #End animation
+    # Last animation
     draw()
     update_draw()
     buffer()
     if backBtn_click: return True
+
+    runTime = time.time() - runTime
+
+    # Save to history
+    history("quicksort", length, speed, runTime, numOfSwaps)
     
+    # End animation
     #green going up
     for i in range(0, listLength):
         rect_draw(green, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])

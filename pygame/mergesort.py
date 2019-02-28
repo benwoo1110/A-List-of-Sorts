@@ -2,6 +2,8 @@ import pygame
 from random import randint
 import time
 
+from history import *
+
 # Declaring Variables
 window_size = (1000, 700)
 
@@ -194,9 +196,12 @@ def mergesort(speed, length, replay):
     heightList_before = mergesort_algo(heightList, 0, listLength-1)
 
     # Sort ended
-    if backBtn_click: return True
+    runTime = time.time() - runTime
     # Show results
     print(heightList)
+
+    # Save to history
+    history("mergesort", length, speed, runTime, numOfSwaps)
 
     # Completed Animation
     heightList, heightList_After = heightList_before.copy(), heightList.copy()

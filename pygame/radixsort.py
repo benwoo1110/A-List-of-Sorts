@@ -2,6 +2,8 @@ import pygame
 from random import shuffle
 import time
 
+from history import *
+
 # Declaring Variables
 window_size = (1000, 700)
 
@@ -169,12 +171,15 @@ def radixsort(speed, length, replay):
     draw()
     
     # Sort ended
-    time_end = time.time()
+    runTime = time.time() - runTime
 
     # Print sorted list to console
     print(heightList)
     print("Swaps: {}".format(numOfSwaps))
-    print(time_end - runTime)
+    print(runTime)
+
+    # Save to history
+    history("radixsort", length, speed, runTime, numOfSwaps)
 
     # Ending animation
     # green going up

@@ -2,6 +2,8 @@ import pygame
 from random import randint
 import time
 
+from history import *
+
 # Declaring Variables
 window_size = (1000, 700)
 
@@ -160,16 +162,19 @@ def bubblesort(speed, length, replay):
             if backBtn_click(): return True
     
     # Sort ended
-    time_end = time.time()
-
     draw() 
     update_draw()
     if backBtn_click(): return True
 
+    runTime = time.time() - runTime
+
     # Print sorted list to console
     print(heightList)
     print("Swaps: {}".format(numOfSwaps))
-    print(time_end - runTime)
+    print(runTime)
+
+    # Save to history
+    history("bubblesort", length, speed, runTime, numOfSwaps)
 
     # Ending animation
     # green going up

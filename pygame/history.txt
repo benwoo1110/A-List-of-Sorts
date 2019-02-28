@@ -1,0 +1,6 @@
+5
+bubblesort 10 6.0 6.999 25
+bubblesort 10 4.2 12.622 16
+bubblesort 10 1.0 31.716 18
+quicksort 3 1.8 2.807 2
+bubblesort 3 1.8 1.677 2
