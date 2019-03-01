@@ -102,6 +102,9 @@ insertionsortMore_btn = pygame.image.load('insertionsortMore_btn.png')
 bogosortMore_btn = pygame.image.load('bogosortMore_btn.png')
 radixsortMore_btn = pygame.image.load('radixsortMore_btn.png')
 
+moreUnselected_btn = pygame.image.load('moreUnselected_btn.png')
+moreSelected_btn = pygame.image.load('moreSelected_btn.png')
+
 historySelected_btn = pygame.image.load('historySelected_btn.png')
 infoSelected_btn = pygame.image.load('infoSelected_btn.png')
 
@@ -258,22 +261,26 @@ def cursor(frame, sort_image, show_image, more_image):
 
         # Cursor on more_btn
         while frame[0]+moreBtn_x+moreBtn_w > mousePos[0] > frame[0]+moreBtn_x and frame[1]+moreBtn_y+moreBtn_h+scroll_y > mousePos[1] > frame[1]+moreBtn_y+scroll_y:
-            # if moreSelected_btn not drawn 
-            # if not moreSelected_drawn:
-                # window.blit(moreSelected_btn, (frame[0]+moreBtn_x, frame[1]+moreBtn_y))
+            # Cursor on more_btn
+            if not moreSelected_drawn:
+                window.blit(moreSelected_btn, (frame[0]+moreBtn_x-10, frame[1]))
+                moreSelected_drawn = True
 
             # Cursor click more_btn
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN: 
-                    if event.button == 1: moreSelection(frame, show_image, more_image) # run sort algorithm
+                    if event.button == 1: 
+                        moreSelected_drawn = False
+                        moreSelection(frame, show_image, more_image) # run sort algorithm
             
                 scroll(event)
             
             mousePos = pygame.mouse.get_pos()
 
         # Cursor move out of more_btn
-        # if moreSelected_drawn:
-            # window.blit(moreUnselected_btn, (frame[0]+moreBtn_x, frame[1]+moreBtn_y))
+        if moreSelected_drawn:
+            window.blit(moreUnselected_btn, (frame[0]+moreBtn_x-10, frame[1]))
+            moreSelected_drawn = False
 
         # Cursor on run_btn
         while frame[0]+runBtn_x+runBtn_w > mousePos[0] > frame[0]+runBtn_x and frame[1]+runBtn_y+runBtn_h+scroll_y > mousePos[1] > frame[1]+runBtn_y+scroll_y:

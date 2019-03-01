@@ -17,18 +17,35 @@ numOfSwaps = 0
 runTime = 0
 backBtn_click = False
 swap = False
+backSelected_drawn = False
 
 heightList_orginal = []
 heightList = []
 xList, y, w = [], 0, 0
 
+window = pygame.display.set_mode((window_size))
+
+# Colour
+white = pygame.Color(255,255,255)
+red = pygame.Color(255,0,0)
+green = pygame.Color(0,255,0)
+blue = pygame.Color(0, 0, 255)
+stats_colour = pygame.Color(67, 67, 67)
+background_colour = pygame.Color(245, 138, 7)
+
+# Font set
+pygame.font.init()
+stats_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
+
+# Load images
+mergesortAlgo_image = pygame.image.load('mergesortAlgo_image.png')
+replay_btn = pygame.image.load('replay_btn.png')
+backSelected_btn = pygame.image.load('backSelected_btn.png')
+backUnselected_btn = pygame.image.load('backUnselected_btn.png')
+timeCover_image = pygame.image.load('timeCover_image.png')
+
 def mergesort(speed, length, replay):
-    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, backBtn_click, swap, window_size, event
-    
-    # Initialization
-    pygame.init()
-    pygame.font.init()
-    window = pygame.display.set_mode((window_size))
+    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, backBtn_click, swap, backSelected_drawn, window_size, event
 
     # Change accordance to length and speed input
     listLength = length
@@ -37,17 +54,6 @@ def mergesort(speed, length, replay):
     spacing = (window_size[0]-w*listLength)//2
     numOfSwaps = 0
     backBtn_click = False
-
-    # Colour
-    white = pygame.Color(255,255,255)
-    red = pygame.Color(255,0,0)
-    green = pygame.Color(0,255,0)
-    blue = pygame.Color(0, 0, 255)
-    stats_colour = pygame.Color(67, 67, 67)
-    background_colour = pygame.Color(245, 138, 7)
-
-    # Font set
-    stats_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
 
     if replay: 
         # Get previous heightList
@@ -70,13 +76,15 @@ def mergesort(speed, length, replay):
 
     # Displaying bars on the window
     def draw(arrList, start, end):
-        global xList, y, heightList, listLength, backBtn_click, numOfSwaps, event
+        global xList, y, heightList, listLength, backBtn_click, backSelected_drawn, numOfSwaps, event
         if backBtn_click: return True
 
         for i in range(start, end+1):
             # Top title bar
-            mergesortAlgo_image = pygame.image.load('mergesortAlgo_image.png')
             window.blit(mergesortAlgo_image,(0, 0))
+            # Show BackSelected_btn
+            if backSelected_drawn: 
+                window.blit(backSelected_btn,(0, 0))
             
             # show stats
             timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
@@ -100,22 +108,33 @@ def mergesort(speed, length, replay):
             if backBtn_click: return True
 
     def buffer():
-        global runSpeed, backBtn_click, event
+        global runSpeed, backBtn_click, backSelected_drawn, event
         if backBtn_click: return True
 
         backBtn_x, backBtn_y, backBtn_w, backBtn_h = 48, 28, 42, 42
         
         for i in range(int(400/runSpeed)):
             mousePos = pygame.mouse.get_pos()
-
+            
             for event in pygame.event.get():
-                # if cusor click in back_btn
-                if event.type == pygame.MOUSEBUTTONDOWN: 
-                    if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
-                        backBtn_click = True
-                        return True
+                # If cursor over back_btn
+                if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
+                    if not backSelected_drawn: 
+                        window.blit(backSelected_btn,(0, 0))
+                        update_draw()
+                        backSelected_drawn = True                    
+                    if event.type == pygame.MOUSEBUTTONDOWN: 
+                        if event.button == 1:
+                            backBtn_click = True
+                            return True # check if back_btn clicked
+                else: 
+                    if backSelected_drawn: 
+                        window.blit(backUnselected_btn,(0, 0))
+                        update_draw()
+                        backSelected_drawn = False   
+                
                 if event.type == pygame.QUIT: pygame.quit()
-                    
+
             time.sleep(0.001)
 
     def update_draw():
@@ -140,8 +159,6 @@ def mergesort(speed, length, replay):
 
     # Start timing
     runTime = time.time()
-    # Load time cover 
-    timeCover_image = pygame.image.load('timeCover_image.png')
 
     # Algorithm
     def mergesort_algo(arrList, start, end):
@@ -196,17 +213,19 @@ def mergesort(speed, length, replay):
     heightList_before = mergesort_algo(heightList, 0, listLength-1)
 
     # Sort ended
-    runTime = time.time() - runTime
-    # Show results
-    print(heightList)
-
-    # Save to history
-    history("mergesort", length, speed, runTime, numOfSwaps)
-
-    # Completed Animation
+    # Completed List
     heightList, heightList_After = heightList_before.copy(), heightList.copy()
     draw(heightList_After, 0, listLength-1)
     if backBtn_click: return True
+
+    # Show results
+    print(heightList)
+
+    # Total runtime
+    runTime = time.time() - runTime
+    
+    # Save to history
+    history("mergesort", length, speed, runTime, numOfSwaps)
 
     # green going up
     for i in range(listLength):
@@ -227,18 +246,32 @@ def mergesort(speed, length, replay):
     replayBtn_x, replayBtn_y, replayBtn_w, replayBtn_h = 791, 454, 165, 54
 
     # Drawn replay_btn
-    replay_btn = pygame.image.load('replay_btn.png')
     window.blit(replay_btn,(791, 454))
     update_draw()
 
     while True:
         mousePos = pygame.mouse.get_pos()
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN: 
-                # if cusor click in back_btn
-                if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
-                    return True
-                if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y:
+
+              # if cusor click in back_btn
+            if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
+                if not backSelected_drawn: 
+                    window.blit(backSelected_btn,(0, 0))
+                    update_draw()
+                    backSelected_drawn = True                    
+                if event.type == pygame.MOUSEBUTTONDOWN: 
+                    if event.button == 1:
+                        backBtn_click = True
+                        return True # check if back_btn clicked
+            else: 
+                if backSelected_drawn: 
+                    window.blit(backUnselected_btn,(0, 0))
+                    update_draw()
+                    backSelected_drawn = False
+
+            # Replay btn pressed
+            if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y:
+                if event.type == pygame.MOUSEBUTTONDOWN: 
                     mergesort(speed, length, True)
                     return True
             if event.type == pygame.QUIT: pygame.quit()

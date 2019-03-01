@@ -23,6 +23,24 @@ xList, y, w = [], 0, 0
 
 window = pygame.display.set_mode((window_size))
 
+# colours
+white = pygame.Color(255, 255, 255)
+red = pygame.Color(255, 0, 0)
+green = pygame.Color(0, 255, 0)
+stats_colour = pygame.Color(67, 67, 67)
+background_colour = pygame.Color(245, 138, 7)
+
+# Font set
+pygame.font.init()
+stats_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
+
+# Load images
+bubblesortAlgo_image = pygame.image.load('bubblesortAlgo_image.png')
+backSelected_btn = pygame.image.load('backSelected_btn.png')
+backUnselected_btn = pygame.image.load('backUnselected_btn.png')
+timeCover_image = pygame.image.load('timeCover_image.png')
+replay_btn = pygame.image.load('replay_btn.png')
+
 def bubblesort(speed, length, replay):
     global window, heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event
 
@@ -31,16 +49,6 @@ def bubblesort(speed, length, replay):
     w = (window_size[0]-spacing*2)//listLength
     spacing = (window_size[0]-w*listLength)//2
     numOfSwaps = 0
-
-    # colours
-    white = pygame.Color(255, 255, 255)
-    red = pygame.Color(255, 0, 0)
-    green = pygame.Color(0, 255, 0)
-    stats_colour = pygame.Color(67, 67, 67)
-    background_colour = pygame.Color(245, 138, 7)
-
-    # Font set
-    stats_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
 
     if replay: 
         # Get previous heightList
@@ -64,14 +72,11 @@ def bubblesort(speed, length, replay):
         global window, xList, y, heightList, listLength, numOfSwaps, backSelected_drawn
         
         # Draw UI
-        bubblesortAlgo_image = pygame.image.load('bubblesortAlgo_image.png')
         window.blit(bubblesortAlgo_image,(0, 0))
         if backSelected_drawn: # Show BackSelected_btn
-            backSelected_btn = pygame.image.load('backSelected_btn.png')
             window.blit(backSelected_btn,(0, 0))
 
         update_draw()
-
 
         # show stats
         timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
@@ -98,14 +103,13 @@ def bubblesort(speed, length, replay):
                 # If cursor over back_btn
                 if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
                     if not backSelected_drawn: 
-                        backSelected_btn = pygame.image.load('backSelected_btn.png')
                         window.blit(backSelected_btn,(0, 0))
                         update_draw()
                         backSelected_drawn = True                    
-                    if event.type == pygame.MOUSEBUTTONDOWN: return True # check if back_btn clicked
+                    if event.type == pygame.MOUSEBUTTONDOWN: 
+                        if event.button == 1: return True # check if back_btn clicked
                 else: 
                     if backSelected_drawn: 
-                        backUnselected_btn = pygame.image.load('backUnselected_btn.png')
                         window.blit(backUnselected_btn,(0, 0))
                         update_draw()
                         backSelected_drawn = False   
@@ -137,8 +141,6 @@ def bubblesort(speed, length, replay):
 
     # Start timing
     runTime = time.time()
-    # Load time cover 
-    timeCover_image = pygame.image.load('timeCover_image.png')
 
     # Algorithm
     for i in range(listLength-1, -1, -1):
@@ -194,7 +196,6 @@ def bubblesort(speed, length, replay):
     replayBtn_x, replayBtn_y, replayBtn_w, replayBtn_h = 791, 454, 165, 54
 
     # Drawn replay_btn
-    replay_btn = pygame.image.load('replay_btn.png')
     window.blit(replay_btn,(791, 454))
     update_draw()
 
@@ -204,14 +205,12 @@ def bubblesort(speed, length, replay):
             # If cursor over back_btn
             if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
                 if not backSelected_drawn: 
-                    backSelected_btn = pygame.image.load('backSelected_btn.png')
                     window.blit(backSelected_btn,(0, 0))
                     update_draw()
                     backSelected_drawn = True                    
                 if event.type == pygame.MOUSEBUTTONDOWN: return True # check if back_btn clicked
             else: 
                 if backSelected_drawn: 
-                    backUnselected_btn = pygame.image.load('backUnselected_btn.png')
                     window.blit(backUnselected_btn,(0, 0))
                     update_draw()
                     backSelected_drawn = False   
