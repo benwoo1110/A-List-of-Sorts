@@ -70,7 +70,7 @@ timeCover_image = pygame.image.load('timeCover_image.png')
 replay_btn = pygame.image.load('replay_btn.png')
 
 def bubblesort(speed, length, replay):
-    global window, heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event
+    global window, heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event, backSelected_btn
 
     # Change accordance to length and speed input
     listLength = length
@@ -194,7 +194,7 @@ def bubblesort(speed, length, replay):
                 swap=True
 
                 numOfSwaps += 1
-            Note(heightList[j-1]*2+390).play(1) 
+            Note(heightList[j]*5+400).play(1)
             print(heightList[j])
             if backBtn_click(): return True
 

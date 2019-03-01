@@ -19,12 +19,12 @@ def mergesort(Arr):
         if first[i] < second[j]:
             Arr[k] = first[i]
             i+=1
-        else:
+        else: 
             Arr[k] = second[j]
             j+=1
 
         k+=1
-    while i < len(first):
+    while i < len(first): 
         Arr[k] = first[i]
         i+=1
         k+=1
