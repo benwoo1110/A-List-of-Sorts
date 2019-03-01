@@ -2,8 +2,6 @@ import pygame
 from random import randint
 from random import shuffle
 import time
-import pyaudio
-import numpy as np
 
 from history import *
 

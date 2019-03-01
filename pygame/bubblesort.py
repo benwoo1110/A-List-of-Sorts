@@ -2,11 +2,9 @@ import pygame
 from random import randint
 import time
 from time import sleep
-import pyaudio
 import math
 import sys
 import os
-import pyaudio
 from pygame.mixer import Sound, get_init, pre_init
 from array import array
 
@@ -29,24 +27,6 @@ heightList_orginal = []
 heightList = []
 xList, y, w = [], 0, 0
 
-class Note(Sound):
-    def __init__(self, frequency, volume=.1):
-        self.frequency = frequency
-        Sound.__init__(self, self.build_samples())
-        self.set_volume(volume)
-    def build_samples(self):
-        period = int(round(get_init()[0] / self.frequency))
-        samples = array("h", [0] * period)
-        amplitude = 2 ** (abs(get_init()[1]) - 1) - 1
-        for time in range(period):
-            if time < period / 2:
-                samples[time] = amplitude
-            else:
-                samples[time] = -amplitude
-        return samples
-
-
-
 window = pygame.display.set_mode((window_size))
 pre_init(44100, -16, 1, 1024)
 pygame.init()
@@ -68,6 +48,22 @@ backSelected_btn = pygame.image.load('backSelected_btn.png')
 backUnselected_btn = pygame.image.load('backUnselected_btn.png')
 timeCover_image = pygame.image.load('timeCover_image.png')
 replay_btn = pygame.image.load('replay_btn.png')
+
+class Note(Sound):
+    def __init__(self, frequency, volume=.1):
+        self.frequency = frequency
+        Sound.__init__(self, self.build_samples())
+        self.set_volume(volume)
+    def build_samples(self):
+        period = int(round(get_init()[0] / self.frequency))
+        samples = array("h", [0] * period)
+        amplitude = 2 ** (abs(get_init()[1]) - 1) - 1
+        for time in range(period):
+            if time < period / 2:
+                samples[time] = amplitude
+            else:
+                samples[time] = -amplitude
+        return samples
 
 def bubblesort(speed, length, replay):
     global window, heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event
@@ -159,8 +155,7 @@ def bubblesort(speed, length, replay):
     def animate_fadein():
         global window
 
-        bubblesortAlgo_image = pygame.image.load(
-            'bubblesortAlgo_image.png').convert()
+        bubblesortAlgo_image = pygame.image.load('bubblesortAlgo_image.png').convert()
 
         for i in range(160, 257, 32):
             bubblesortAlgo_image.set_alpha(i)
@@ -180,12 +175,10 @@ def bubblesort(speed, length, replay):
             draw()  # Draw fundamental bars first
          
             if swap:
-                rect_draw(green, xList[j], maxHeight + \
-                          titleHeight-heightList[j], w, heightList[j])
+                rect_draw(green, xList[j], maxHeight + titleHeight-heightList[j], w, heightList[j])
                 swap=False
             else:
-                rect_draw(red, xList[j], maxHeight + \
-                          titleHeight-heightList[j], w, heightList[j])
+                rect_draw(red, xList[j], maxHeight + titleHeight-heightList[j], w, heightList[j])
              
             update_draw()
 
@@ -237,7 +230,6 @@ def bubblesort(speed, length, replay):
     replayBtn_x, replayBtn_y, replayBtn_w, replayBtn_h=791, 454, 165, 54
 
     # Drawn replay_btn
-    replay_btn=pygame.image.load('replay_btn.png')
     window.blit(replay_btn, (791, 454))
     update_draw()
 
@@ -247,15 +239,12 @@ def bubblesort(speed, length, replay):
             # If cursor over back_btn
             if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
                 if not backSelected_drawn:
-                    backSelected_btn=pygame.image.load('backSelected_btn.png')
                     window.blit(backSelected_btn, (0, 0))
                     update_draw()
                     backSelected_drawn=True
                 if event.type == pygame.MOUSEBUTTONDOWN: return True  # check if back_btn clicked
             else:
                 if backSelected_drawn:
-                    backUnselected_btn=pygame.image.load(
-                        'backUnselected_btn.png')
                     window.blit(backUnselected_btn, (0, 0))
                     update_draw()
                     backSelected_drawn=False
