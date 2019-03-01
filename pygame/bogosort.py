@@ -2,14 +2,16 @@ import pygame
 from random import randint
 from random import shuffle
 import time
+import pyaudio
+import numpy as np
 
 # Declaring Variables
 window_size = (1000, 700)
-
 listLength = 0
 titleHeight = 128
 maxHeight = 390
 spacing = 75
+minFreq = 330
 
 numOfSwaps = 0
 runTime = 0
@@ -18,6 +20,9 @@ swap = False
 heightList_orginal = []
 heightList = []
 xList, y, w = [], 0, 0
+
+p=pyaudio.PyAudio()
+volume = 0.5
 
 def bogosort(speed, length, replay):
     global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, window_size, event
