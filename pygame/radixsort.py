@@ -2,7 +2,7 @@ import pygame
 from random import shuffle
 import time
 
-from history import *
+from history import addHistory
 
 # Declaring Variables
 window_size = (1000, 700)
@@ -40,7 +40,7 @@ backUnselected_btn = pygame.image.load('backUnselected_btn.png')
 timeCover_image = pygame.image.load('timeCover_image.png')
 replay_btn = pygame.image.load('replay_btn.png')
 
-def radixsort(speed, length, replay):
+def radixsort_run(speed, length, replay):
     global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, backSelected_drawn, window_size, event
 
     # Change accordance to length and speed input
@@ -194,7 +194,7 @@ def radixsort(speed, length, replay):
     print(runTime)
 
     # Save to history
-    history("radixsort", length, speed, runTime, numOfSwaps)
+    addHistory("radixsort", length, speed, runTime, numOfSwaps)
 
     # Ending animation
     # green going up

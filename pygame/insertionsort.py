@@ -2,7 +2,7 @@ import pygame
 from random import randint
 import time
 
-from history import *
+from history import addHistory
 
 # Declaring Variables
 window_size = (1000, 700)
@@ -41,7 +41,7 @@ backUnselected_btn = pygame.image.load('backUnselected_btn.png')
 timeCover_image = pygame.image.load('timeCover_image.png')
 replay_btn = pygame.image.load('replay_btn.png')
 
-def insertionsort(speed, length, replay):
+def insertionsort_run(speed, length, replay):
     global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, backSelected_drawn, runTime, window_size, event
 
     # Change accordance to length and speed input
@@ -180,7 +180,7 @@ def insertionsort(speed, length, replay):
     print(runTime)
 
     # Save to history
-    history("insertionsort", length, speed, runTime, numOfSwaps)
+    addHistory("insertionsort", length, speed, runTime, numOfSwaps)
 
     # Ending animation
     # green going up

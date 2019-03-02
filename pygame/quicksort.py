@@ -2,7 +2,7 @@ import pygame
 from random import randint
 import time
 
-from history import *
+from history import addHistory
 
 # Declaring Variables
 window_size = (1000, 700)
@@ -44,7 +44,7 @@ backSelected_btn = pygame.image.load('backSelected_btn.png')
 backUnselected_btn = pygame.image.load('backUnselected_btn.png')
 timeCover_image = pygame.image.load('timeCover_image.png')
 
-def quicksort(speed, length, replay):
+def quicksort_run(speed, length, replay):
     global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, swap, backSelected_drawn, backBtn_click, window_size, event
 
     # Change accordance to length and speed input
@@ -279,7 +279,7 @@ def quicksort(speed, length, replay):
     runTime = time.time() - runTime
 
     # Save to history
-    history("quicksort", length, speed, runTime, numOfSwaps)
+    addHistory("quicksort", length, speed, runTime, numOfSwaps)
     
     # End animation
     #green going up

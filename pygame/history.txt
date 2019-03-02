@@ -1,4 +1,5 @@
-36
+38
+radixsort 10 1.0 74.647 30
 bogosort 3 3.0 0.99 4
 bogosort 3 3.0 1.468 6
 radixsort 7 3.0 19.165 21

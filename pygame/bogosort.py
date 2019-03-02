@@ -3,7 +3,7 @@ from random import randint
 from random import shuffle
 import time
 
-from history import *
+from history import addHistory
 
 # Declaring Variables
 window_size = (1000, 700)
@@ -42,7 +42,7 @@ backUnselected_btn = pygame.image.load('backUnselected_btn.png')
 timeCover_image = pygame.image.load('timeCover_image.png')
 replay_btn = pygame.image.load('replay_btn.png')
 
-def bogosort(speed, length, replay):
+def bogosort_run(speed, length, replay):
     global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event
 
     # Change accordance to length and speed input
@@ -169,7 +169,7 @@ def bogosort(speed, length, replay):
     print(runTime)
 
     # Save to history
-    history("bogosort", length, speed, runTime, numOfSwaps)
+    addHistory("bogosort", length, speed, runTime, numOfSwaps)
 
     # Ending animation
     # green going up

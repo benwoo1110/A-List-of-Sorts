@@ -8,7 +8,7 @@ import os
 from pygame.mixer import Sound, get_init, pre_init
 from array import array
 
-from history import *
+from history import addHistory
 
 # Declaring Variables
 window_size = (1000, 700)
@@ -65,8 +65,8 @@ class Note(Sound):
                 samples[time] = -amplitude
         return samples
 
-def bubblesort(speed, length, replay):
-    global window, heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event, backSelected_btn
+def bubblesort_run(speed, length, replay):
+    global window, heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event
 
     # Change accordance to length and speed input
     listLength = length
@@ -187,8 +187,10 @@ def bubblesort(speed, length, replay):
                 swap=True
 
                 numOfSwaps += 1
+
+            # Play sound
             Note(heightList[j]*5+400).play(1)
-            print(heightList[j])
+
             if backBtn_click(): return True
 
     # Sort ended
@@ -208,13 +210,17 @@ def bubblesort(speed, length, replay):
     print(runTime)
 
     # Save to history
-    history("bubblesort", length, speed, runTime, numOfSwaps)
+    addHistory("bubblesort", length, speed, runTime, numOfSwaps)
 
     # Ending animation
     # green going up
     for i in range(listLength):
         rect_draw(green, xList[i], maxHeight + \
                   titleHeight-heightList[i], w, heightList[i])
+                  
+        # Play sound
+        Note(heightList[i]*5+400).play(1)
+        
         update_draw()
         if backBtn_click(): return True
 
@@ -222,6 +228,10 @@ def bubblesort(speed, length, replay):
     for i in range(listLength-1, -1, -1):
         rect_draw(white, xList[i], maxHeight + \
                   titleHeight-heightList[i], w, heightList[i])
+
+        # Play sound
+        Note(heightList[i]*5+400).play(1)
+
         update_draw()
         if backBtn_click(): return True
 
