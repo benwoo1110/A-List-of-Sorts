@@ -6,7 +6,6 @@ historyFile_I = open("history.txt", "r")
 
 # Number of data
 lines = int(historyFile_I.readline().strip(' '))
-
 data = [''] * (lines)
 
 for i in range(0, lines):

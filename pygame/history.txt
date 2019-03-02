@@ -1,4 +1,8 @@
-38
+41
+bubblesort 10 1.0 26.617 29
+bubblesort 10 1.0 26.568 18
+mergesort 30 7.0 15.192 0
+mergesort 10 1.0 18.579 0
 radixsort 10 1.0 74.647 30
 bogosort 3 3.0 0.99 4
 bogosort 3 3.0 1.468 6

@@ -84,11 +84,11 @@ def radixsort_run(speed, length, replay):
         swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
         speedStats_text = stats_font.render(str(round(speed, 1)) + " x", True, stats_colour)
         listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
-        window.blit(timeStats_text,(321, 568))
-        window.blit(swapStats_text,(321, 616))
-        window.blit(speedStats_text,(729, 568))
-        window.blit(listlengthStats_text,(729, 616))
-         
+        
+        window.blit(timeStats_text, (300, 570))
+        window.blit(swapStats_text, (392, 617))
+        window.blit(speedStats_text, (739, 570))
+        window.blit(listlengthStats_text, (794, 617))
 
         for i in range(listLength):
             rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])

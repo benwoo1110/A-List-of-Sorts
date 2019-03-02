@@ -1,14 +1,9 @@
 import pygame
 from random import randint
 import time
-from time import sleep
-import math
-import sys
-import os
-from pygame.mixer import Sound, get_init, pre_init
-from array import array
 
 from history import addHistory
+from sound import Note
 
 # Declaring Variables
 window_size = (1000, 700)
@@ -28,7 +23,6 @@ heightList = []
 xList, y, w = [], 0, 0
 
 window = pygame.display.set_mode((window_size))
-pre_init(44100, -16, 1, 1024)
 pygame.init()
 
 # colours
@@ -48,22 +42,6 @@ backSelected_btn = pygame.image.load('backSelected_btn.png')
 backUnselected_btn = pygame.image.load('backUnselected_btn.png')
 timeCover_image = pygame.image.load('timeCover_image.png')
 replay_btn = pygame.image.load('replay_btn.png')
-
-class Note(Sound):
-    def __init__(self, frequency, volume=.1):
-        self.frequency = frequency
-        Sound.__init__(self, self.build_samples())
-        self.set_volume(volume)
-    def build_samples(self):
-        period = int(round(get_init()[0] / self.frequency))
-        samples = array("h", [0] * period)
-        amplitude = 2 ** (abs(get_init()[1]) - 1) - 1
-        for time in range(period):
-            if time < period / 2:
-                samples[time] = amplitude
-            else:
-                samples[time] = -amplitude
-        return samples
 
 def bubblesort_run(speed, length, replay):
     global window, heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event
@@ -103,17 +81,15 @@ def bubblesort_run(speed, length, replay):
         update_draw()
 
         # show stats
-        timeStats_text = stats_font.render(
-            str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
+        timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
         swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
-        speedStats_text = stats_font.render(
-            str(round(speed, 1)) + " x", True, stats_colour)
-        listlengthStats_text = stats_font.render(
-            str(int(listLength)), True, stats_colour)
-        window.blit(timeStats_text, (321, 568))
-        window.blit(swapStats_text, (321, 616))
-        window.blit(speedStats_text, (729, 568))
-        window.blit(listlengthStats_text, (729, 616))
+        speedStats_text = stats_font.render(str(round(speed, 1)) + " x", True, stats_colour)
+        listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
+
+        window.blit(timeStats_text, (300, 570))
+        window.blit(swapStats_text, (392, 617))
+        window.blit(speedStats_text, (739, 570))
+        window.blit(listlengthStats_text, (794, 617))
 
         for i in range(listLength):
             rect_draw(white, xList[i], maxHeight +
