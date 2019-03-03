@@ -190,9 +190,6 @@ def showSort(sort):
     # Draw last run
     lastRun_text = config_font.render(sort.last_run, True, config_colour)
     window.blit(lastRun_text,(frame[0]+lastRun_x, frame[1]+lastRun_y))
-    # Draw speed
-    #sortSpeed_text = config_font.render(sort.speed, True, config_colour)
-    #window.blit(sortSpeed_text,(frame[0]+sortSpeed_x, frame[1]+sortSpeed_y)buffer
 
 def showOption():
     global scroll_y
@@ -284,7 +281,7 @@ def optionSelection():
                     update_draw()
                     creditsSelected_drawn = True
                 # Open credits page
-                if clicked: pass # Add help page here
+                if clicked: pass # Add credits page here
             else: 
                 if creditsSelected_drawn:
                     screen.blit(optionShown_btn,(0, scroll_y))
