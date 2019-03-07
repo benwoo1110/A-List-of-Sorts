@@ -1,4 +1,17 @@
-45
+58
+bubblesort 10 1.0 29.565 21
+radixsort 10 1.0 74.895 30
+bubblesort 3 1.0 2.578 0
+bubblesort 3 1.0 2.602 0
+bubblesort 2 1.0 1.355 0
+bubblesort 3 1.0 2.566 1
+bubblesort 3 1.0 2.644 0
+bubblesort 2 1.0 1.373 1
+bubblesort 10 1.0 9.02 27
+bubblesort 10 1.0 25.768 18
+bubblesort 2 1.0 1.18 1
+insertionsort 10 1.0 40.021 30
+insertionsort 10 1.0 17.554 13
 quicksort 3 1.8 2.238 2
 quicksort 3 1.8 2.241 2
 bubblesort 40 3.0 177.823 443

@@ -376,87 +376,6 @@ def setupView(sort_type):
 
     update_draw()
 
-def history_run(sort_type):
-    global backBtn_click, lines, data, scroll_y, totalSwaps, totalTime, moreBtn_Ys, shownData
-
-    # Reset varibles
-    backBtn_click = False
-    lines = 0
-    totalSwaps = 0
-    totalTime = 0
-    scroll_y = 0
-    moreBtn_Ys = []
-    shownData = []
-
-    # Set up view
-    setupView(sort_type)
-
-    clicked = False
-    moreSelected_drawn = False
-    deleteAllSelected_drawn = False
-    moreSelectedDrawn_y = 0
-
-    while True:
-        for event in pygame.event.get():  
-            # Check for left click
-            if event.type == pygame.MOUSEBUTTONDOWN: 
-                if event.button == 1: clicked = True
-                else: clicked = False
-            else: clicked = False
-
-            mousePos = pygame.mouse.get_pos()  
-            
-            # More Btn
-            if more_btn.x+more_btn.w > mousePos[0] > more_btn.x:
-                for y in moreBtn_Ys:
-                    if y+more_btn.h > mousePos[1]-scroll_y > y:
-                        # drawn historyMoreSelected_btn
-                        if not moreSelected_drawn:
-                            window.blit(historyMoreSelected_btn, (more_btn.x, y))
-                            moreSelectedDrawn_y = y
-                            moreSelected_drawn = True
-                        # If more button clicked
-                        if clicked: historyDetail(shownData[moreBtn_Ys.index(y)], sort_type)
-                        break
-                    # return back to unselected image when cursor not in y axis of more_btns
-                    else: 
-                        if moreSelected_drawn: 
-                            window.blit(historyMoreUnselected_btn, (more_btn.x, moreSelectedDrawn_y))
-                            moreSelected_drawn = False
-            # return back to unselected image when cursor not in x axis of more_btns
-            else: 
-                if moreSelected_drawn: 
-                    window.blit(historyMoreUnselected_btn, (more_btn.x, moreSelectedDrawn_y))
-                    moreSelected_drawn = False
-
-            # deleteAll button
-            while deleteAll_btn.x+deleteAll_btn.w > mousePos[0] > deleteAll_btn.x and deleteAll_btn.y+deleteAll_btn.h > mousePos[1] > deleteAll_btn.y:
-                if not deleteAllSelected_drawn:
-                    screen.blit(historyDeleteAllSelected_btn, (deleteAll_btn.x-10, 0))
-                    update_draw()
-                    deleteAllSelected_drawn = True
-                
-                for event in pygame.event.get():
-                    # If deleteAll button clicked
-                    if event.type == pygame.MOUSEBUTTONDOWN: 
-                        if event.button == 1: 
-                            if historyDeleteConfirm(): 
-                                data = []
-                                removeHistory()
-                                return True
-
-                    if event.type == pygame.QUIT: pygame.quit()
-                
-                mousePos = pygame.mouse.get_pos()
-
-            # return back to unselected image when cursor not in x axis of more_btns
-            deleteAllSelected_drawn = False
-            
-            # Buffer stuff
-            if event.type == pygame.QUIT: pygame.quit()
-            scroll(event)
-            if backBtn_click: return True # Go back
-
 def historyDeleteConfirm():
     screen.blit(optionBackground_image, (0,0))
     screen.blit(historyDeleteAllConfirm_btn, (0,0))
@@ -508,3 +427,85 @@ def historyDeleteConfirm():
                 
             if event.type == pygame.QUIT: pygame.quit()
 
+def history_run(sort_type):
+    global backBtn_click, lines, data, scroll_y, totalSwaps, totalTime, moreBtn_Ys, shownData
+
+    # Reset varibles
+    backBtn_click = False
+    lines = 0
+    totalSwaps = 0
+    totalTime = 0
+    scroll_y = 0
+    moreBtn_Ys = []
+    shownData = []
+
+    # Set up view
+    setupView(sort_type)
+
+    clicked = False
+    moreSelected_drawn = False
+    deleteAllSelected_drawn = False
+    moreSelectedDrawn_y = 0
+
+    while True:
+        for event in pygame.event.get():  
+            # Check for left click
+            if event.type == pygame.MOUSEBUTTONDOWN: 
+                if event.button == 1: clicked = True
+                else: clicked = False
+            else: clicked = False
+
+            mousePos = pygame.mouse.get_pos()  
+            
+            # More Btn
+            if more_btn.x+more_btn.w > mousePos[0] > more_btn.x:
+                for y in moreBtn_Ys:
+                    if y+more_btn.h > mousePos[1]-scroll_y > y:
+                        # drawn historyMoreSelected_btn
+                        if not moreSelected_drawn:
+                            window.blit(historyMoreSelected_btn, (more_btn.x, y))
+                            moreSelectedDrawn_y = y
+                            moreSelected_drawn = True
+                        # If more button clicked
+                        if clicked: 
+                            if historyDetail(shownData[moreBtn_Ys.index(y)], sort_type) == 'sort_run':
+                                return 'run'
+                        break
+                    # return back to unselected image when cursor not in y axis of more_btns
+                    else: 
+                        if moreSelected_drawn: 
+                            window.blit(historyMoreUnselected_btn, (more_btn.x, moreSelectedDrawn_y))
+                            moreSelected_drawn = False
+            # return back to unselected image when cursor not in x axis of more_btns
+            else: 
+                if moreSelected_drawn: 
+                    window.blit(historyMoreUnselected_btn, (more_btn.x, moreSelectedDrawn_y))
+                    moreSelected_drawn = False
+
+            # deleteAll button
+            while deleteAll_btn.x+deleteAll_btn.w > mousePos[0] > deleteAll_btn.x and deleteAll_btn.y+deleteAll_btn.h > mousePos[1] > deleteAll_btn.y:
+                if not deleteAllSelected_drawn:
+                    screen.blit(historyDeleteAllSelected_btn, (deleteAll_btn.x-10, 0))
+                    update_draw()
+                    deleteAllSelected_drawn = True
+                
+                for event in pygame.event.get():
+                    # If deleteAll button clicked
+                    if event.type == pygame.MOUSEBUTTONDOWN: 
+                        if event.button == 1: 
+                            if historyDeleteConfirm(): 
+                                data = []
+                                removeHistory()
+                                return 'back'
+
+                    if event.type == pygame.QUIT: pygame.quit()
+                
+                mousePos = pygame.mouse.get_pos()
+
+            # return back to unselected image when cursor not in x axis of more_btns
+            deleteAllSelected_drawn = False
+            
+            # Buffer stuff
+            if event.type == pygame.QUIT: pygame.quit()
+            scroll(event)
+            if backBtn_click: return 'back' # Go back

@@ -3,6 +3,7 @@ from random import randint
 import time
 
 from history import addHistory
+from sound import Note
 
 # Declaring Variables
 window_size = (1000, 700)
@@ -53,7 +54,7 @@ def insertionsort_run(speed, length, replay):
     if replay: 
         # Get previous heightList
         heightList = heightList_orginal.copy()
-        print(heightList_orginal)
+        # print(heightList_orginal)
     else: 
         # Reset variables
         xList = []
@@ -64,7 +65,7 @@ def insertionsort_run(speed, length, replay):
             heightList.append(randint(10, maxHeight))
             xList.append(spacing + w*i)
         heightList_orginal = heightList.copy()
-        print(heightList_orginal)
+        # print(heightList_orginal)
 
     def rect_draw(colour, x, y, w, h):
         pygame.draw.rect(window, colour, (x, y, w, h), 0)
@@ -156,8 +157,12 @@ def insertionsort_run(speed, length, replay):
                 rect_draw(green, xList[s], maxHeight+titleHeight-heightList[s], w, heightList[s])
                 rect_draw(red, xList[s-1], maxHeight+titleHeight-heightList[s-1], w, heightList[s-1])
                 update_draw()
-                heightList[s], heightList[s-1] = heightList[s-1], heightList[s]
+                
                 if backBtn_click(): return True
+                Note(heightList[s]*5+400).play(1)
+
+                # Change
+                heightList[s], heightList[s-1] = heightList[s-1], heightList[s]
                 
                 # After swap
                 draw()
@@ -165,8 +170,10 @@ def insertionsort_run(speed, length, replay):
                 rect_draw(red, xList[s], maxHeight+titleHeight-heightList[s], w, heightList[s])
                 rect_draw(green, xList[s-1], maxHeight+titleHeight-heightList[s-1], w, heightList[s-1])
                 update_draw()
+
                 numOfSwaps +=1
                 if backBtn_click(): return True
+                Note(heightList[s-1]*5+400).play(1)
 
             else: break
     draw()
@@ -221,7 +228,7 @@ def insertionsort_run(speed, length, replay):
 
             if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y:
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    insertionsort(speed, length, True)
+                    insertionsort_run(speed, length, True)
                     return True
 
             if event.type == pygame.QUIT: pygame.quit()

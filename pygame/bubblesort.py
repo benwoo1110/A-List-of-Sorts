@@ -1,9 +1,18 @@
 import pygame
 from random import randint
 import time
+from dataclasses import dataclass
 
 from history import addHistory
+from history import history_run
 from sound import Note
+
+@dataclass
+class coordinates(object):
+    x : int
+    y : int
+    w : int
+    h : int
 
 # Declaring Variables
 window_size = (1000, 700)
@@ -15,8 +24,10 @@ spacing = 75
 
 numOfSwaps = 0
 runTime = 0
+runSpeed = 0
 swap = False
 backSelected_drawn = False
+optionSelected_drawn = False
 
 heightList_orginal = []
 heightList = []
@@ -37,21 +48,204 @@ pygame.font.init()
 stats_font = pygame.font.SysFont('Helvetica Neue Bold', 50)
 
 # Load images
-bubblesortAlgo_image = pygame.image.load('bubblesortAlgo_image.png')
+bubblesortAlgo_image = pygame.image.load('bubblesortAlgo_image.png').convert()
 backSelected_btn = pygame.image.load('backSelected_btn.png')
 backUnselected_btn = pygame.image.load('backUnselected_btn.png')
 timeCover_image = pygame.image.load('timeCover_image.png')
 replay_btn = pygame.image.load('replay_btn.png')
 
+optionSelected_btn = pygame.image.load('optionSelected_btn.png')
+optionUnselected_btn = pygame.image.load('optionUnselected_btn.png')
+sortOptionsShown_btn = pygame.image.load('sortOptionsShown_btn.png')
+
+historySelected_btn = pygame.image.load('historySelected_btn.png')
+infoSelected_btn = pygame.image.load('infoSelected_btn.png')
+
+optionBackground_image = pygame.image.load('optionBackground_image.png').convert()
+optionBackground_image.set_alpha(78)
+
+# UI Coordinates
+backBtn_x, backBtn_y, backBtn_w, backBtn_h = 48, 28, 42, 42
+optionsBtn_x, optionsBtn_y, optionsBtn_w, optionsBtn_h = 905, 17, 65, 65
+replayBtn_x, replayBtn_y, replayBtn_w, replayBtn_h=791, 454, 165, 54
+
+option_Frame = coordinates(x=661, y=96, w=310, h=175)
+infomation_btn = coordinates(x=678, y=114, w=275, h=60)
+history_btn = coordinates(x=678, y=192, w=275, h=60)
+
+# Fade in animation
+def animate_fadein():
+    global bubblesortAlgo_image
+
+    for i in range(160, 257, 32):
+        bubblesortAlgo_image.set_alpha(i)
+        window.blit(bubblesortAlgo_image, (0, 0))
+        update_draw()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: pygame.quit()
+
+def rect_draw(colour, x, y, w, h):
+    global window
+    pygame.draw.rect(window, colour, (x, y, w, h), 0)
+
+def draw():
+    global xList, y, heightList, listLength, numOfSwaps, backSelected_drawn, optionSelected_drawn
+
+    # Draw UI
+    window.blit(bubblesortAlgo_image,(0, 0))
+    if backSelected_drawn: # Show BackSelected_btn
+        window.blit(backSelected_btn,(0, 0))
+
+    if optionSelected_drawn: # Show optionSelected_btn
+        window.blit(optionSelected_btn,(905-10, 0))
+
+    update_draw()
+
+    # show stats
+    timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
+    swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
+    speedStats_text = stats_font.render(str(round(runSpeed, 1)) + " x", True, stats_colour)
+    listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
+
+    window.blit(timeStats_text, (300, 570))
+    window.blit(swapStats_text, (392, 617))
+    window.blit(speedStats_text, (739, 570))
+    window.blit(listlengthStats_text, (794, 617))
+
+    for i in range(listLength):
+        rect_draw(white, xList[i], maxHeight +
+                    titleHeight-heightList[i], w, heightList[i])
+
+def update_draw():
+    pygame.display.flip()
+    pygame.display.update()
+    pygame.time.Clock().tick(10000000000)
+
+def click_action(replay):
+    global backSelected_drawn, optionSelected_drawn
+
+    clicked = False
+
+    for event in pygame.event.get():
+        # Check for left click
+        if event.type == pygame.MOUSEBUTTONDOWN: 
+            if event.button == 1: clicked = True
+            else: clicked = False
+        else: clicked = False
+
+        mousePos = pygame.mouse.get_pos()
+
+        # If cursor over back_btn
+        if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
+            if not backSelected_drawn: 
+                window.blit(backSelected_btn, (0, 0))
+                update_draw()
+                backSelected_drawn = True                    
+            if clicked: return 'end' # check if back_btn clicked
+        else: 
+            if backSelected_drawn: 
+                window.blit(backUnselected_btn, (0, 0))
+                update_draw()
+                backSelected_drawn = False
+            
+        # Sort option buttton
+        if optionsBtn_x+optionsBtn_w > mousePos[0] > optionsBtn_x and optionsBtn_y+optionsBtn_h > mousePos[1] > optionsBtn_y:
+            if not optionSelected_drawn:
+                window.blit(optionSelected_btn, (optionsBtn_x-10, 0))
+                update_draw()
+                optionSelected_drawn = True
+            if clicked: 
+                optionsShown()
+                optionSelected_drawn = False
+                return 'next'
+        else: 
+            if optionSelected_drawn: 
+                window.blit(optionUnselected_btn, (optionsBtn_x-10, 0))
+                update_draw()      
+                optionSelected_drawn = False
+
+        # Replay button
+        if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y and replay:
+            if clicked:
+                bubblesort_run(runSpeed, listLength, True)
+                return 'end'
+
+        if event.type == pygame.QUIT: pygame.quit()
+
+def btn_click():
+
+    for i in range(int(400/runSpeed)):
+        mousePos = pygame.mouse.get_pos()
+        action = click_action(False)
+        if action == 'next': break
+        if action == 'end': return True
+
+        time.sleep(0.001)
+
+def optionsShown():
+    window.blit(optionBackground_image, (0,0))
+    window.blit(sortOptionsShown_btn, (0,0))
+    update_draw()
+
+    clicked = False
+    historySelected_drawn = False
+    infoSelected_drawn = False
+
+    while True:
+        mousePos = pygame.mouse.get_pos()
+
+        for event in pygame.event.get(): 
+            # Check for left click
+            if event.type == pygame.MOUSEBUTTONDOWN: 
+                if event.button == 1: clicked = True
+                else: clicked = False
+            else: clicked = False
+
+            # Cursor on Infomation
+            if infomation_btn.x+infomation_btn.w > mousePos[0] > infomation_btn.x and infomation_btn.y+infomation_btn.h > mousePos[1] > infomation_btn.y:
+                if not historySelected_drawn:
+                    window.blit(infoSelected_btn, (option_Frame.x, option_Frame.y))
+                    update_draw()
+                    historySelected_drawn = True
+                # Open help page
+                if clicked: pass # Add help page here
+            else: 
+                if historySelected_drawn:
+                    window.blit(sortOptionsShown_btn, (0, 0))
+                    update_draw()
+                    historySelected_drawn = False
+
+            # Cursor on History
+            if history_btn.x+history_btn.w > mousePos[0] > history_btn.x and history_btn.y+history_btn.h > mousePos[1] > history_btn.y:
+                if not infoSelected_drawn:
+                    window.blit(historySelected_btn, (option_Frame.x, option_Frame.y))
+                    update_draw()
+                    infoSelected_drawn = True
+                # Open History page
+                if clicked: 
+                    history_run('bubblesort')
+                    return True
+            else: 
+                if infoSelected_drawn:
+                    window.blit(sortOptionsShown_btn, (0, 0))
+                    update_draw()
+                    infoSelected_drawn = False
+
+            # Cursor click out of option frame
+            if not(option_Frame.x+option_Frame.w > mousePos[0] > option_Frame.x and option_Frame.y+option_Frame.h > mousePos[1] > option_Frame.y):
+                if clicked: return True 
+                    
+
 def bubblesort_run(speed, length, replay):
-    global window, heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event
+    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, runSpeed
 
     # Change accordance to length and speed input
     listLength = length
     w = (window_size[0]-spacing*2)//listLength
     spacing = (window_size[0]-w*listLength)//2
     numOfSwaps = 0
-
+    runSpeed = speed
+    
     if replay: 
         # Get previous heightList
         heightList = heightList_orginal.copy()
@@ -66,80 +260,7 @@ def bubblesort_run(speed, length, replay):
             xList.append(spacing + w*i)
         heightList_orginal = heightList.copy()
 
-    def rect_draw(colour, x, y, w, h):
-        global window
-        pygame.draw.rect(window, colour, (x, y, w, h), 0)
-
-    def draw():
-        global window, xList, y, heightList, listLength, numOfSwaps, backSelected_drawn
-
-        # Draw UI
-        window.blit(bubblesortAlgo_image,(0, 0))
-        if backSelected_drawn: # Show BackSelected_btn
-            window.blit(backSelected_btn,(0, 0))
-
-        update_draw()
-
-        # show stats
-        timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
-        swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
-        speedStats_text = stats_font.render(str(round(speed, 1)) + " x", True, stats_colour)
-        listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
-
-        window.blit(timeStats_text, (300, 570))
-        window.blit(swapStats_text, (392, 617))
-        window.blit(speedStats_text, (739, 570))
-        window.blit(listlengthStats_text, (794, 617))
-
-        for i in range(listLength):
-            rect_draw(white, xList[i], maxHeight +
-                      titleHeight-heightList[i], w, heightList[i])
-
-    def backBtn_click():
-        global window, backSelected_drawn, event
-        backBtn_x, backBtn_y, backBtn_w, backBtn_h = 48, 28, 42, 42
-
-        for i in range(int(400/speed)):
-            mousePos = pygame.mouse.get_pos()
-
-            for event in pygame.event.get():
-                # If cursor over back_btn
-                if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
-                    if not backSelected_drawn: 
-                        window.blit(backSelected_btn,(0, 0))
-                        update_draw()
-                        backSelected_drawn = True                    
-                    if event.type == pygame.MOUSEBUTTONDOWN: 
-                        if event.button == 1: return True # check if back_btn clicked
-                else: 
-                    if backSelected_drawn: 
-                        window.blit(backUnselected_btn,(0, 0))
-                        update_draw()
-                        backSelected_drawn = False
-
-                if event.type == pygame.QUIT: pygame.quit()
-
-            time.sleep(0.001)
-
-    def update_draw():
-        pygame.display.flip()
-        pygame.display.update()
-        pygame.time.Clock().tick(10000000000)
-
     # Start sort
-    # Fade in animation
-    def animate_fadein():
-        global window
-
-        bubblesortAlgo_image = pygame.image.load('bubblesortAlgo_image.png').convert()
-
-        for i in range(160, 257, 32):
-            bubblesortAlgo_image.set_alpha(i)
-            window.blit(bubblesortAlgo_image, (0, 0))
-            update_draw()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT: pygame.quit()
-
     # animate_fadein()
 
     # Start timing
@@ -152,32 +273,31 @@ def bubblesort_run(speed, length, replay):
          
             if swap:
                 rect_draw(green, xList[j], maxHeight + titleHeight-heightList[j], w, heightList[j])
-                swap=False
-            else:
-                rect_draw(red, xList[j], maxHeight + titleHeight-heightList[j], w, heightList[j])
+                swap = False
+            else: rect_draw(red, xList[j], maxHeight + titleHeight-heightList[j], w, heightList[j])
              
             update_draw()
 
             if heightList[j] > heightList[j+1]:
                 heightList[j], heightList[j+1]=heightList[j+1], heightList[j]
-                swap=True
+                swap = True
 
                 numOfSwaps += 1
 
             # Play sound
             Note(heightList[j]*5+400).play(1)
 
-            if backBtn_click(): return True
+            if btn_click(): return True
 
     # Sort ended
     time_end=time.time()
    
     draw()
-
     update_draw()
      
-    if backBtn_click(): return True
-
+    if btn_click(): return True
+    
+    # Get total runTime
     runTime = time.time() - runTime
 
     # Print sorted list to console
@@ -192,52 +312,26 @@ def bubblesort_run(speed, length, replay):
     # green going up
     for i in range(listLength):
         rect_draw(green, xList[i], maxHeight + \
-                  titleHeight-heightList[i], w, heightList[i])
-                  
+                  titleHeight-heightList[i], w, heightList[i])     
         # Play sound
         Note(heightList[i]*5+400).play(1)
         
         update_draw()
-        if backBtn_click(): return True
+        if btn_click(): return True
 
     # green going down
     for i in range(listLength-1, -1, -1):
         rect_draw(white, xList[i], maxHeight + \
                   titleHeight-heightList[i], w, heightList[i])
-
         # Play sound
         Note(heightList[i]*5+400).play(1)
 
         update_draw()
-        if backBtn_click(): return True
-
-    # Coordinates of back && replay btn
-    backBtn_x, backBtn_y, backBtn_w, backBtn_h=48, 28, 42, 42
-    replayBtn_x, replayBtn_y, replayBtn_w, replayBtn_h=791, 454, 165, 54
+        if btn_click(): return True
 
     # Drawn replay_btn
     window.blit(replay_btn, (791, 454))
     update_draw()
 
     while True:
-        mousePos=pygame.mouse.get_pos()
-        for event in pygame.event.get():
-            # If cursor over back_btn
-            if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
-                if not backSelected_drawn:
-                    window.blit(backSelected_btn, (0, 0))
-                    update_draw()
-                    backSelected_drawn=True
-                if event.type == pygame.MOUSEBUTTONDOWN: return True  # check if back_btn clicked
-            else:
-                if backSelected_drawn:
-                    window.blit(backUnselected_btn, (0, 0))
-                    update_draw()
-                    backSelected_drawn=False
-
-            if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    bubblesort(speed, length, True)
-                    return True
-
-            if event.type == pygame.QUIT: pygame.quit()
+        if click_action(True): return True

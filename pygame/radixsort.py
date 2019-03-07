@@ -3,6 +3,7 @@ from random import shuffle
 import time
 
 from history import addHistory
+from sound import Note
 
 # Declaring Variables
 window_size = (1000, 700)
@@ -167,6 +168,9 @@ def radixsort_run(speed, length, replay):
                     draw()
                     for y in [d for d,x in enumerate(heightList) if x == hSort[i][-1]]:
                         rect_draw(red, xList[y], maxHeight+titleHeight-heightList[y], w, heightList[y])
+                        # Play sound
+                        Note(heightList[y]*5+400).play(1)
+
                     update_draw()
                     if backBtn_click(): return True
                     for t in range(int(400/speed)): time.sleep(0.0005)
@@ -181,6 +185,10 @@ def radixsort_run(speed, length, replay):
                     draw()
                     rect_draw(red, xList[0], maxHeight+titleHeight-heightList[0], w, heightList[0])
                     update_draw()
+
+                    # Play sound
+                    Note(heightList[0]*5+400).play(1)
+
                     if backBtn_click(): return True
                     for t in range(int(400/speed)): time.sleep(0.0005)
     draw()
@@ -235,7 +243,7 @@ def radixsort_run(speed, length, replay):
 
             if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y:
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    radixsort(speed, length, True)
+                    radixsort_run(speed, length, True)
                     return True
 
             if event.type == pygame.QUIT: pygame.quit()
