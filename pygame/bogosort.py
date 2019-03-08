@@ -30,6 +30,8 @@ runSpeed = 0
 swap = False
 backSelected_drawn = False
 infoSelected_drawn = False
+sort_done = False
+isPause = False
 
 heightList_orginal = []
 heightList = []
@@ -88,7 +90,7 @@ def update_draw():
     pygame.time.Clock().tick(1000000000)
 
 def draw():
-    global xList, y, heightList, listLength, numOfSwaps, backSelected_drawn, optionSelected_drawn
+    global xList, y, heightList, listLength, numOfSwaps, backSelected_drawn, optionSelected_drawn, sort_done
 
     # Draw UI
     window.blit(bogosortAlgo_image,(0, 0))
@@ -100,8 +102,12 @@ def draw():
 
     update_draw()
 
+    time_current = runTime
+    if not sort_done:
+        time_current = time.time() - runTime
+
     # show stats
-    timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
+    timeStats_text = stats_font.render(str(round(time_current, 3)) + " sec", True, stats_colour)
     swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
     speedStats_text = stats_font.render(str(round(runSpeed, 1)) + " x", True, stats_colour)
     listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
@@ -148,7 +154,9 @@ def click_action(replay):
                 update_draw()
                 infoSelected_drawn = True                    
             if clicked: 
+                pause()
                 information_run('bogosort')
+                pause()
                 draw()
                 update_draw()
                 return 'next'
@@ -161,6 +169,7 @@ def click_action(replay):
         # Replay button
         if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y and replay:
             if clicked:
+                sort_done = False
                 bogosort_run(runSpeed, listLength, True)
                 return 'end'
 
@@ -178,7 +187,7 @@ def btn_click():
         time.sleep(0.001)  
 
 def bogosort_run(speed, length, replay):
-    global heightList_orginal, heightList, xList, w, listLength, runSpeed, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, backSelected_drawn, window_size, event
+    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, numOfSwaps, runTime, swap, runSpeed, sort_done
 
     # Change accordance to length and speed input
     listLength = length
@@ -226,7 +235,9 @@ def bogosort_run(speed, length, replay):
     draw()
     
     # Sort ended
+    # Get total runTime
     runTime = time.time() - runTime
+    sort_done = True
 
     # Print sorted list to console
     print(heightList)
@@ -237,7 +248,6 @@ def bogosort_run(speed, length, replay):
     addHistory("bogosort", length, speed, runTime, numOfSwaps)
 
     # Ending animation
-    runSpeed = 400.0
     # green going up
     for i in range(listLength):
         draw()
@@ -266,3 +276,13 @@ def bogosort_run(speed, length, replay):
     while True:
         action = click_action(True)
         if action == 'back' or action == 'end': return True
+
+def pause():
+    global runTime, isPause
+    
+    if isPause:
+        isPause = False
+        runTime = time.time() - runTime
+    else:
+        isPause = True
+        runTime = time.time() - runTime

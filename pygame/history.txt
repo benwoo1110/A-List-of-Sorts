@@ -1,4 +1,4 @@
-56
+40
 bubblesort 6 3.6 4.469 4
 bubblesort 5 2.6 3.702 6
 bubblesort 7 2.7 7.208 10
@@ -39,19 +39,3 @@ mergesort 4 1.9 3.581 8
 mergesort 4 2.2 2.198 8
 mergesort 4 2.2 2.224 8
 bubblesort 3 1.9 1.328 1
-bubblesort 3 1.9 1.344 0
-quicksort 4 1.0 5.737 3
-quicksort 10 4.0 4.266 8
-quicksort 10 1.0 14.07 8
-radixsort 30 10.0 35.062 90
-radixsort 10 5.4 17.015 30
-radixsort 10 4.0 20.798 30
-mergesort 10 1.0 18.284 34
-bubblesort 10 1.0 29.565 21
-radixsort 10 1.0 74.895 30
-bubblesort 3 1.0 2.578 0
-bubblesort 3 1.0 2.602 0
-bubblesort 3 1.0 2.566 1
-bubblesort 3 1.0 2.644 0
-bubblesort 2 1.0 1.373 1
-bubblesort 10 1.0 9.02 27

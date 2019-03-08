@@ -29,6 +29,8 @@ backBtn_click = False
 swap = False
 backSelected_drawn = False
 infoSelected_drawn = False
+sort_done = False
+isPause = False
 
 heightList_orginal = []
 heightList = []
@@ -85,7 +87,7 @@ def update_draw():
 
 # Displaying bars on the window
 def draw(arrList, start, end):
-    global xList, y, heightList, listLength, backBtn_click, backSelected_drawn, numOfSwaps, event
+    global xList, y, heightList, listLength, numOfSwaps, backSelected_drawn, optionSelected_drawn, sort_done
     if backBtn_click: return True
 
     for i in range(start, end+1):
@@ -100,8 +102,12 @@ def draw(arrList, start, end):
         if infoSelected_drawn: # Show optionSelected_btn
             window.blit(sortInfoSelected_btn, (info_btn.x-10, 0))
         
+        time_current = runTime
+        if not sort_done:
+            time_current = time.time() - runTime
+
         # show stats
-        timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
+        timeStats_text = stats_font.render(str(round(time_current, 3)) + " sec", True, stats_colour)
         swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
         speedStats_text = stats_font.render(str(round(runSpeed, 1)) + " x", True, stats_colour)
         listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
@@ -159,7 +165,9 @@ def click_action(replay):
                 update_draw()
                 infoSelected_drawn = True                    
             if clicked: 
+                pause()
                 information_run('mergesort')
+                pause()
                 return 'next'
         else: 
             if infoSelected_drawn: 
@@ -170,6 +178,7 @@ def click_action(replay):
         # Replay button
         if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y and replay:
             if clicked:
+                sort_done = False
                 mergesort_run(runSpeed, listLength, True)
                 return 'end'
 
@@ -187,7 +196,7 @@ def btn_click():
         time.sleep(0.001)
 
 def mergesort_run(speed, length, replay):
-    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, backBtn_click, swap, backSelected_drawn, window_size, event
+    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, backBtn_click, swap, backSelected_drawn, window_size, event, sort_done
 
     # Change accordance to length and speed input
     listLength = length
@@ -270,6 +279,10 @@ def mergesort_run(speed, length, replay):
     heightList_before = mergesort_algo(heightList, 0, listLength-1)
 
     # Sort ended
+    # Get total runTime
+    runTime = time.time() - runTime
+    sort_done = True
+
     # Completed List
     heightList, heightList_After = heightList_before.copy(), heightList.copy()
     draw(heightList_After, 0, listLength-1)
@@ -277,9 +290,6 @@ def mergesort_run(speed, length, replay):
 
     # Show results
     print(heightList)
-
-    # Total runtime
-    runTime = time.time() - runTime
     
     # Save to history
     addHistory("mergesort", length, speed, runTime, numOfSwaps)
@@ -332,7 +342,7 @@ def drawPage():
         window.blit(sortInfoSelected_btn, (info_btn.x-10, 0))
 
     # show stats
-    timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
+    timeStats_text = stats_font.render(str(round(runTime, 3)) + " sec", True, stats_colour)
     swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
     speedStats_text = stats_font.render(str(round(runSpeed, 1)) + " x", True, stats_colour)
     listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
@@ -344,3 +354,13 @@ def drawPage():
 
     for j in range(len(heightList)):
         rect_draw(white, xList[j], maxHeight+titleHeight-heightList[j], w, heightList[j])
+
+def pause():
+    global runTime, isPause
+    
+    if isPause:
+        isPause = False
+        runTime = time.time() - runTime
+    else:
+        isPause = True
+        runTime = time.time() - runTime

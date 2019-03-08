@@ -29,6 +29,8 @@ backBtn_click = False
 swap = False
 backSelected_drawn = False
 infoSelected_drawn = False
+sort_done = False
+isPause = False
 
 heightList_orginal = []
 heightList = []
@@ -89,7 +91,7 @@ def update_draw():
 
 #Displaying bars on the window
 def draw():
-    global xList, y, heightList, listLength, numOfSwaps, backBtn_click
+    global xList, y, heightList, listLength, numOfSwaps, backSelected_drawn, optionSelected_drawn, sort_done
     if backBtn_click: return True
     
     # Top title bar
@@ -98,10 +100,14 @@ def draw():
     if backSelected_drawn: 
         window.blit(backSelected_btn,(0, 0))
 
+    time_current = runTime
+    if not sort_done:
+        time_current = time.time() - runTime
+
     # Update stats
-    timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
+    timeStats_text = stats_font.render(str(round(time_current, 3)) + " sec", True, stats_colour)
     swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
-    speedStats_text = stats_font.render(str(round(speed, 1)) + " x", True, stats_colour)
+    speedStats_text = stats_font.render(str(round(runSpeed, 1)) + " x", True, stats_colour)
     listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
     
     window.blit(timeStats_text, (300, 570))
@@ -110,33 +116,6 @@ def draw():
     window.blit(listlengthStats_text, (794, 617))
         
     # Update bars
-    for i in range(listLength):
-        rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
-
-def draw():
-    global xList, y, heightList, listLength, numOfSwaps, backSelected_drawn, optionSelected_drawn
-
-    # Draw UI
-    window.blit(quicksortAlgo_image,(0, 0))
-    if backSelected_drawn: # Show BackSelected_btn
-        window.blit(backSelected_btn,(0, 0))
-
-    if infoSelected_drawn: # Show optionSelected_btn
-        window.blit(sortInfoSelected_btn, (info_btn.x-10, 0))
-
-    update_draw()
-
-    # show stats
-    timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
-    swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
-    speedStats_text = stats_font.render(str(round(runSpeed, 1)) + " x", True, stats_colour)
-    listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
-
-    window.blit(timeStats_text, (300, 570))
-    window.blit(swapStats_text, (392, 617))
-    window.blit(speedStats_text, (739, 570))
-    window.blit(listlengthStats_text, (794, 617))
-
     for i in range(listLength):
         rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
 
@@ -174,7 +153,9 @@ def click_action(replay):
                 update_draw()
                 infoSelected_drawn = True                    
             if clicked: 
+                pause()
                 information_run('quicksort')
+                pause()
                 draw()
                 update_draw()
                 return 'next'
@@ -187,6 +168,7 @@ def click_action(replay):
         # Replay button
         if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y and replay:
             if clicked:
+                sort_done = False
                 quicksort_run(runSpeed, listLength, True)
                 return 'end'
 
@@ -204,7 +186,7 @@ def btn_click():
         time.sleep(0.001)
 
 def quicksort_run(speed, length, replay):
-    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, swap, backSelected_drawn, backBtn_click, window_size, event
+    global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, swap, backSelected_drawn, backBtn_click, window_size, event, sort_done
 
     # Change accordance to length and speed input
     listLength = length
@@ -359,6 +341,10 @@ def quicksort_run(speed, length, replay):
     quickSort(heightList)
 
     #Sort Ended
+    # Get total runTime
+    runTime = time.time() - runTime
+    sort_done = True
+
     #Show results
     print(heightList)
 
@@ -367,8 +353,6 @@ def quicksort_run(speed, length, replay):
     update_draw()
     btn_click()
     if backBtn_click: return True
-
-    runTime = time.time() - runTime
 
     # Save to history
     addHistory("quicksort", length, speed, runTime, numOfSwaps)
@@ -403,3 +387,13 @@ def quicksort_run(speed, length, replay):
     while True:
         action = click_action(True)
         if action == 'back' or action == 'end': return True
+
+def pause():
+    global runTime, isPause
+    
+    if isPause:
+        isPause = False
+        runTime = time.time() - runTime
+    else:
+        isPause = True
+        runTime = time.time() - runTime

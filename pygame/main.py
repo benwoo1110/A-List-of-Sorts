@@ -252,6 +252,7 @@ def showOption():
                 if event.button == 1:
                     optionSelected_drawn = False
                     optionSelection()
+                    setup()
 
             scroll(event)
 
@@ -354,6 +355,8 @@ def optionSelection():
             if event.type == pygame.QUIT:
                 pygame.quit()
 
+                
+
 
 def showConfig(sort):
     global scroll_y
@@ -437,9 +440,6 @@ def moreSelection(sort):
             scroll(event)
 
         mousePos = pygame.mouse.get_pos()
-
-# Check if cursor in box
-
 
 def sortSelection(sort):
     global scroll_y, speed, listlength, helpPage_drawn
