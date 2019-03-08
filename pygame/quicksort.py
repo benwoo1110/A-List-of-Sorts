@@ -1,8 +1,18 @@
 import pygame
 from random import randint
 import time
+from dataclasses import dataclass
 
 from history import addHistory
+from sound import Note
+from information import information_run 
+
+@dataclass
+class coordinates(object):
+    x : int
+    y : int
+    w : int
+    h : int
 
 # Declaring Variables
 window_size = (1000, 700)
@@ -18,6 +28,7 @@ runTime = 0
 backBtn_click = False
 swap = False
 backSelected_drawn = False
+infoSelected_drawn = False
 
 heightList_orginal = []
 heightList = []
@@ -42,7 +53,155 @@ quicksortAlgo_image = pygame.image.load('quicksortAlgo_image.png')
 replay_btn = pygame.image.load('replay_btn.png')
 backSelected_btn = pygame.image.load('backSelected_btn.png')
 backUnselected_btn = pygame.image.load('backUnselected_btn.png')
-timeCover_image = pygame.image.load('timeCover_image.png')
+
+sortInfoSelected_btn = pygame.image.load('sortInfoSelected_btn.png')
+sortInfoUnselected_btn = pygame.image.load('sortInfoUnselected_btn.png')
+
+# UI coordinates
+backBtn_x, backBtn_y, backBtn_w, backBtn_h = 48, 28, 42, 42
+replayBtn_x, replayBtn_y, replayBtn_w, replayBtn_h = 791, 454, 165, 54
+info_btn = coordinates(x=905, y=17, w=65, h=65)
+
+def animate_fadein():
+    # Fade in animation
+    mainscreen_image = pygame.image.load('mainscreen_image.png').convert()
+    quicksortAlgo_image = pygame.image.load('quicksortAlgo_image.png').convert()
+
+    window.blit(mainscreen_image,(0, 0))
+
+    for i in range (160, 257, 32):
+        quicksortAlgo_image.set_alpha(i)
+        window.blit(quicksortAlgo_image,(0, 0))
+        update_draw()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: pygame.quit()
+
+def rect_draw(colour, x, y, w, h):
+    pygame.draw.rect(window, colour, (x, y, w, h), 0)
+
+def update_draw(): 
+    global runSpeed, backBtn_click, event
+    if backBtn_click: return True
+
+    pygame.display.flip()
+    pygame.display.update()
+    pygame.time.Clock().tick(10000000000)
+
+#Displaying bars on the window
+def draw():
+    global xList, y, heightList, listLength, numOfSwaps, backBtn_click
+    if backBtn_click: return True
+    
+    # Top title bar
+    window.blit(quicksortAlgo_image,(0, 0))
+    # Show BackSelected_btn
+    if backSelected_drawn: 
+        window.blit(backSelected_btn,(0, 0))
+
+    # Update stats
+    timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
+    swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
+    speedStats_text = stats_font.render(str(round(speed, 1)) + " x", True, stats_colour)
+    listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
+    
+    window.blit(timeStats_text, (300, 570))
+    window.blit(swapStats_text, (392, 617))
+    window.blit(speedStats_text, (739, 570))
+    window.blit(listlengthStats_text, (794, 617))
+        
+    # Update bars
+    for i in range(listLength):
+        rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
+
+def draw():
+    global xList, y, heightList, listLength, numOfSwaps, backSelected_drawn, optionSelected_drawn
+
+    # Draw UI
+    window.blit(quicksortAlgo_image,(0, 0))
+    if backSelected_drawn: # Show BackSelected_btn
+        window.blit(backSelected_btn,(0, 0))
+
+    if infoSelected_drawn: # Show optionSelected_btn
+        window.blit(sortInfoSelected_btn, (info_btn.x-10, 0))
+
+    update_draw()
+
+    # show stats
+    timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
+    swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
+    speedStats_text = stats_font.render(str(round(runSpeed, 1)) + " x", True, stats_colour)
+    listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
+
+    window.blit(timeStats_text, (300, 570))
+    window.blit(swapStats_text, (392, 617))
+    window.blit(speedStats_text, (739, 570))
+    window.blit(listlengthStats_text, (794, 617))
+
+    for i in range(listLength):
+        rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
+
+def click_action(replay):
+    global backSelected_drawn, infoSelected_drawn
+
+    clicked = False
+
+    for event in pygame.event.get():
+        # Check for left click
+        if event.type == pygame.MOUSEBUTTONDOWN: 
+            if event.button == 1: clicked = True
+            else: clicked = False
+        else: clicked = False
+
+        mousePos = pygame.mouse.get_pos()
+
+        # If cursor over back_btn
+        if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
+            if not backSelected_drawn: 
+                window.blit(backSelected_btn, (0, 0))
+                update_draw()
+                backSelected_drawn = True                    
+            if clicked: return 'back' # check if back_btn clicked
+        else: 
+            if backSelected_drawn: 
+                window.blit(backUnselected_btn, (0, 0))
+                update_draw()
+                backSelected_drawn = False
+
+        # Info button
+        if info_btn.x+info_btn.w > mousePos[0] > info_btn.x and info_btn.y+info_btn.h > mousePos[1] > info_btn.y:
+            if not infoSelected_drawn: 
+                window.blit(sortInfoSelected_btn, (info_btn.x-10, 0))
+                update_draw()
+                infoSelected_drawn = True                    
+            if clicked: 
+                information_run('quicksort')
+                draw()
+                update_draw()
+                return 'next'
+        else: 
+            if infoSelected_drawn: 
+                window.blit(sortInfoUnselected_btn, (info_btn.x-10, 0))
+                update_draw()
+                infoSelected_drawn = False
+
+        # Replay button
+        if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y and replay:
+            if clicked:
+                quicksort_run(runSpeed, listLength, True)
+                return 'end'
+
+        if event.type == pygame.QUIT: pygame.quit()
+
+def btn_click():
+    global runSpeed, backBtn_click, backSelected_drawn, event
+    if backBtn_click: return True
+    
+    for i in range(int(400/runSpeed)):
+        mousePos = pygame.mouse.get_pos()
+
+        if click_action(False) == 'back': backBtn_click = True
+
+        time.sleep(0.001)
 
 def quicksort_run(speed, length, replay):
     global heightList_orginal, heightList, xList, w, listLength, titleHeight, maxHeight, spacing, runSpeed, numOfSwaps, runTime, swap, backSelected_drawn, backBtn_click, window_size, event
@@ -70,90 +229,8 @@ def quicksort_run(speed, length, replay):
             xList.append(spacing + w*i)
         heightList_orginal = heightList.copy()
         print(heightList_orginal)
-
-    def rect_draw(colour, x, y, w, h):
-        pygame.draw.rect(window, colour, (x, y, w, h), 0)
-
-
-    #Displaying bars on the window
-    def draw():
-        global xList, y, heightList, listLength, numOfSwaps, backBtn_click
-        if backBtn_click: return True
-        
-        # Top title bar
-        window.blit(quicksortAlgo_image,(0, 0))
-        # Show BackSelected_btn
-        if backSelected_drawn: 
-            window.blit(backSelected_btn,(0, 0))
-
-        # Update stats
-        timeStats_text = stats_font.render(str(round(time.time() - runTime, 3)) + " sec", True, stats_colour)
-        swapStats_text = stats_font.render(str(numOfSwaps), True, stats_colour)
-        speedStats_text = stats_font.render(str(round(speed, 1)) + " x", True, stats_colour)
-        listlengthStats_text = stats_font.render(str(int(listLength)), True, stats_colour)
-        
-        window.blit(timeStats_text, (300, 570))
-        window.blit(swapStats_text, (392, 617))
-        window.blit(speedStats_text, (739, 570))
-        window.blit(listlengthStats_text, (794, 617))
-         
-        # Update bars
-        for i in range(listLength):
-            rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
-
-    def buffer():
-        global runSpeed, backBtn_click, backSelected_drawn, event
-        if backBtn_click: return True
-
-        backBtn_x, backBtn_y, backBtn_w, backBtn_h = 48, 28, 42, 42
-        
-        for i in range(int(400/runSpeed)):
-            mousePos = pygame.mouse.get_pos()
-            
-            for event in pygame.event.get():
-                # If cursor over back_btn
-                if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
-                    if not backSelected_drawn: 
-                        window.blit(backSelected_btn,(0, 0))
-                        update_draw()
-                        backSelected_drawn = True                    
-                    if event.type == pygame.MOUSEBUTTONDOWN: 
-                        if event.button == 1:
-                            backBtn_click = True
-                            return True # check if back_btn clicked
-                else: 
-                    if backSelected_drawn: 
-                        window.blit(backUnselected_btn,(0, 0))
-                        update_draw()
-                        backSelected_drawn = False   
-                
-                if event.type == pygame.QUIT: pygame.quit()
-
-            time.sleep(0.001)
-
-    def update_draw(): 
-        global runSpeed, backBtn_click, event
-        if backBtn_click: return True
-
-        pygame.display.flip()
-        pygame.display.update()
-        pygame.time.Clock().tick(10000000000)
     
-    # Start sort
-    def animate_fadein():
-        # Fade in animation
-        mainscreen_image = pygame.image.load('mainscreen_image.png').convert()
-        quicksortAlgo_image = pygame.image.load('quicksortAlgo_image.png').convert()
-
-        window.blit(mainscreen_image,(0, 0))
-
-        for i in range (160, 257, 32):
-            quicksortAlgo_image.set_alpha(i)
-            window.blit(quicksortAlgo_image,(0, 0))
-            update_draw()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT: pygame.quit()
-    
+    # Start sort 
     # Start timing
     runTime = time.time()
 
@@ -200,8 +277,11 @@ def quicksort_run(speed, length, replay):
                 rect_draw(green, xList[end], maxHeight+titleHeight-heightList[end], w, heightList[end])
                 swap = False
 
+                # Play sound
+                Note(heightList[border]*5+400).play(1)
+
             update_draw()
-            buffer()
+            btn_click()
             if backBtn_click: return True
     
 
@@ -223,9 +303,12 @@ def quicksort_run(speed, length, replay):
                 rect_draw(red, xList[border], maxHeight+titleHeight-heightList[border], w, heightList[border])
                 rect_draw(red, xList[end], maxHeight+titleHeight-heightList[end], w, heightList[end])
                 update_draw()
-                buffer()
+                # Play sound
+                Note(heightList[border]*5+400).play(1)
+
+                btn_click()
                 if backBtn_click: return True
-    
+                
 
                 heightList[border], heightList[end] = heightList[end], heightList[border]
                 
@@ -234,20 +317,25 @@ def quicksort_run(speed, length, replay):
                 rect_draw(blue, xList[pivotindex], maxHeight+titleHeight-heightList[pivotindex], w, heightList[pivotindex])
                 rect_draw(green, xList[border], maxHeight+titleHeight-heightList[border], w, heightList[border])
                 rect_draw(green, xList[end], maxHeight+titleHeight-heightList[end], w, heightList[end])
-                
-                numOfSwaps += 1
                 update_draw()
-                buffer()
+                # Play sound
+                Note(heightList[border]*5+400).play(1)
+
+                btn_click()
                 if backBtn_click: return True
-    
+
+                numOfSwaps += 1
+
 
 
         #it swaps again
         rect_draw(red, xList[first], maxHeight+titleHeight-heightList[first], w, heightList[first])
         rect_draw(red, xList[end], maxHeight+titleHeight-heightList[end], w, heightList[end])
-        
         update_draw() 
-        buffer()
+        # Play sound
+        Note(heightList[first]*5+400).play(1)
+        
+        btn_click()
         if backBtn_click: return True
     
 
@@ -257,11 +345,14 @@ def quicksort_run(speed, length, replay):
         rect_draw(blue, xList[pivotindex], maxHeight+titleHeight-heightList[pivotindex], w, heightList[pivotindex])
         rect_draw(green, xList[first], maxHeight+titleHeight-heightList[first], w, heightList[first])
         rect_draw(green, xList[end], maxHeight+titleHeight-heightList[end], w, heightList[end])
-        
-        numOfSwaps += 1
         update_draw()
-        buffer()
+        # Play sound
+        Note(heightList[first]*5+400).play(1)
+
+        btn_click()
         if backBtn_click: return True
+
+        numOfSwaps += 1
 
         return end
 
@@ -274,7 +365,7 @@ def quicksort_run(speed, length, replay):
     # Last animation
     draw()
     update_draw()
-    buffer()
+    btn_click()
     if backBtn_click: return True
 
     runTime = time.time() - runTime
@@ -282,52 +373,33 @@ def quicksort_run(speed, length, replay):
     # Save to history
     addHistory("quicksort", length, speed, runTime, numOfSwaps)
     
-    # End animation
-    #green going up
-    for i in range(0, listLength):
-        rect_draw(green, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
+    # Ending animation
+    runSpeed = 400.0
+    # green going up
+    for i in range(listLength):
+        draw()
+        rect_draw(green, xList[i], maxHeight + titleHeight-heightList[i], w, heightList[i])     
+        # Play sound
+        Note(heightList[i]*5+400).play(1)
+        
         update_draw()
-        buffer()
-        if backBtn_click: return True
-    
-    #green going down
-    for i in range(listLength-1, -1, -1):
-        rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
-        update_draw()
-        buffer()
-        if backBtn_click: return True
+        if btn_click(): return True
 
-    # Coordinates of back && replay btn
-    backBtn_x, backBtn_y, backBtn_w, backBtn_h = 48, 28, 42, 42
-    replayBtn_x, replayBtn_y, replayBtn_w, replayBtn_h = 791, 454, 165, 54
+    # green going down
+    for i in range(listLength-1, -1, -1):
+        draw()
+        rect_draw(green, xList[i], maxHeight + titleHeight-heightList[i], w, heightList[i])     
+        # Play sound
+        Note(heightList[i]*5+400).play(1)
+        
+        update_draw()
+        if btn_click(): return True
 
     # Drawn replay_btn
-    window.blit(replay_btn,(791, 454))
+    draw()
+    window.blit(replay_btn, (791, 454))
     update_draw()
 
     while True:
-        mousePos = pygame.mouse.get_pos()
-        for event in pygame.event.get():
-
-              # if cusor click in back_btn
-            if backBtn_x+backBtn_w > mousePos[0] > backBtn_x and backBtn_y+backBtn_h > mousePos[1] > backBtn_y:
-                if not backSelected_drawn: 
-                    window.blit(backSelected_btn,(0, 0))
-                    update_draw()
-                    backSelected_drawn = True                    
-                if event.type == pygame.MOUSEBUTTONDOWN: 
-                    if event.button == 1:
-                        backBtn_click = True
-                        return True # check if back_btn clicked
-            else: 
-                if backSelected_drawn: 
-                    window.blit(backUnselected_btn,(0, 0))
-                    update_draw()
-                    backSelected_drawn = False
-
-            # Replay btn pressed
-            if replayBtn_x+replayBtn_w > mousePos[0] > replayBtn_x and replayBtn_y+replayBtn_h > mousePos[1] > replayBtn_y:
-                if event.type == pygame.MOUSEBUTTONDOWN: 
-                    quicksort(speed, length, True)
-                    return True
-            if event.type == pygame.QUIT: pygame.quit()
+        action = click_action(True)
+        if action == 'back' or action == 'end': return True
