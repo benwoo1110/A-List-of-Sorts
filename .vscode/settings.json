@@ -1,4 +1,5 @@
 {
-    "python.pythonPath": "/Users/mehtaaakashsanjay/anaconda3/bin/python",
-    "python.linting.pylintEnabled": false
+    "python.pythonPath": "/Library/Frameworks/Python.framework/Versions/3.7/bin/python3",
+    "python.linting.pylintEnabled": false,
+    "git.ignoreLimitWarning": true
 }
