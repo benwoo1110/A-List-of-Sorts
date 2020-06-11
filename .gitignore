@@ -1,7 +1,3 @@
-.eggs/*
-dist/*
-build/*
-
 # Ignore Mac system files
 .DS_store
 
