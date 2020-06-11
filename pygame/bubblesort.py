@@ -98,8 +98,6 @@ def draw():
     if infoSelected_drawn: # Show optionSelected_btn
         window.blit(sortInfoSelected_btn, (info_btn.x-10, 0))
 
-    update_draw()
-
     time_current = runTime
     if not sort_done:
         time_current = time.time() - runTime
@@ -117,6 +115,9 @@ def draw():
 
     for i in range(listLength):
         rect_draw(white, xList[i], maxHeight+titleHeight-heightList[i], w, heightList[i])
+
+    update_draw()
+
 
 def click_action(replay):
     global backSelected_drawn, infoSelected_drawn
