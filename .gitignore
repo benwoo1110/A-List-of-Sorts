@@ -1,3 +1,14 @@
-pygame/.eggs/
-pygame/dist/
-pygame/build/
+.eggs/*
+dist/*
+build/*
+
+# Ignore Mac system files
+.DS_store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 
+.vscode
