@@ -1,5 +1,4 @@
 import pygame
-import os
 import time
 from dataclasses import dataclass
 
